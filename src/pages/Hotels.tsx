@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Filter, Star, MapPin, Wifi, Car, Coffee, Utensils, Shield } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -278,9 +278,11 @@ const Hotels = () => {
                       </div>
 
                       {/* Action Button */}
-                      <Button className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 px-8">
-                        View Details & Book
-                      </Button>
+                      <Link to={`/hotels/${hotel.id}`}>
+                        <Button className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 px-8">
+                          View Details & Book
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

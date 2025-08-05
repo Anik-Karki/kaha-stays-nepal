@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Star, MapPin, Phone, MessageCircle, Wifi, Car, Coffee, 
   Utensils, Users, ArrowLeft, Calendar, CreditCard, CheckCircle 
@@ -14,11 +13,15 @@ import { findBestRoomMatch, getRoomTypeColor, formatRoomTypeName } from '../util
 
 const HotelDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [guestCount, setGuestCount] = useState(2);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedRoomMatch, setSelectedRoomMatch] = useState<any>(null);
 
-  // Mock hotel data
+  const handleBackClick = () => {
+    navigate('/hotels');
+  };
+
   const hotel = {
     id: 1,
     name: 'Hotel Everest View',
@@ -164,7 +167,10 @@ const HotelDetail = () => {
       
       <div className="container mx-auto px-4 py-8">
         {/* Back Navigation */}
-        <button className="flex items-center text-blue-600 hover:text-blue-700 mb-6">
+        <button 
+          onClick={handleBackClick}
+          className="flex items-center text-blue-600 hover:text-blue-700 mb-6"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to search results
         </button>

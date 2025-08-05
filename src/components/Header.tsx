@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Globe, Menu, X, MapPin, Users, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,13 +8,19 @@ import { Input } from '@/components/ui/input';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearchDetail, setShowSearchDetail] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    navigate('/hotels');
+    setShowSearchDetail(false);
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">K</span>
             </div>
@@ -21,15 +28,15 @@ const Header = () => {
               <span className="font-bold text-xl text-gray-900">KAHA</span>
               <span className="text-sm text-blue-600 ml-1">Hotel</span>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
-            <a href="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</a>
-            <a href="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</a>
-            <a href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</a>
-            <a href="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</a>
+            <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
+            <Link to="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</Link>
+            <Link to="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</Link>
+            <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</Link>
+            <Link to="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</Link>
           </nav>
 
           {/* Search Bar */}
@@ -76,7 +83,7 @@ const Header = () => {
                         <Input placeholder="Number of guests" type="number" className="pl-10" />
                       </div>
                     </div>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleSearch} className="w-full bg-blue-600 hover:bg-blue-700">
                       Search Hotels
                     </Button>
                   </div>
@@ -111,11 +118,11 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 py-4">
             <nav className="flex flex-col space-y-4">
-              <a href="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
-              <a href="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</a>
-              <a href="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</a>
-              <a href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</a>
-              <a href="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</a>
+              <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
+              <Link to="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</Link>
+              <Link to="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</Link>
+              <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</Link>
+              <Link to="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</Link>
               <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
                 <Button variant="outline" size="sm">Login</Button>
                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Register</Button>
