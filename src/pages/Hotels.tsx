@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Filter, Star, MapPin, Wifi, Car, Coffee, Utensils, Shield } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -8,10 +9,21 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 
 const Hotels = () => {
+  const [searchParams] = useSearchParams();
   const [priceRange, setPriceRange] = useState([1000, 10000]);
   const [selectedRoomTypes, setSelectedRoomTypes] = useState<string[]>([]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('popularity');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredHotels, setFilteredHotels] = useState([]);
+
+  // Get search parameters from URL
+  const locationParam = searchParams.get('location') || '';
+  const guestsParam = searchParams.get('guests') || '2';
+
+  useEffect(() => {
+    setSearchTerm(locationParam);
+  }, [locationParam]);
 
   const mockHotels = [
     {
@@ -24,7 +36,8 @@ const Hotels = () => {
       image: '🏛️',
       verified: true,
       roomTypes: ['economy', 'standarddelux', 'suite'],
-      amenities: ['wifi', 'parking', 'restaurant', 'breakfast']
+      amenities: ['wifi', 'parking', 'restaurant', 'breakfast'],
+      city: 'kathmandu'
     },
     {
       id: 2,
@@ -36,7 +49,8 @@ const Hotels = () => {
       image: '🏔️',
       verified: true,
       roomTypes: ['standarddelux', 'suite', 'family'],
-      amenities: ['wifi', 'restaurant', 'breakfast', 'spa']
+      amenities: ['wifi', 'restaurant', 'breakfast', 'spa'],
+      city: 'pokhara'
     },
     {
       id: 3,
@@ -48,7 +62,8 @@ const Hotels = () => {
       image: '⛰️',
       verified: false,
       roomTypes: ['economy', 'standarddelux'],
-      amenities: ['wifi', 'parking', 'breakfast']
+      amenities: ['wifi', 'parking', 'breakfast'],
+      city: 'bhaktapur'
     },
     {
       id: 4,
@@ -60,9 +75,87 @@ const Hotels = () => {
       image: '🏰',
       verified: true,
       roomTypes: ['suite', 'family'],
-      amenities: ['wifi', 'parking', 'restaurant', 'breakfast', 'spa']
+      amenities: ['wifi', 'parking', 'restaurant', 'breakfast', 'spa'],
+      city: 'kathmandu'
+    },
+    {
+      id: 5,
+      name: 'Safari Resort Chitwan',
+      location: 'Sauraha, Chitwan',
+      rating: 4.5,
+      reviewCount: 178,
+      price: 3800,
+      image: '🐘',
+      verified: true,
+      roomTypes: ['standarddelux', 'family'],
+      amenities: ['wifi', 'restaurant', 'breakfast'],
+      city: 'chitwan'
+    },
+    {
+      id: 6,
+      name: 'Buddha Garden Hotel',
+      location: 'Lumbini Garden, Lumbini',
+      rating: 4.7,
+      reviewCount: 145,
+      price: 2800,
+      image: '☸️',
+      verified: true,
+      roomTypes: ['economy', 'standarddelux', 'suite'],
+      amenities: ['wifi', 'parking', 'restaurant', 'breakfast'],
+      city: 'lumbini'
     }
   ];
+
+  // Filter hotels based on search and filters
+  useEffect(() => {
+    let filtered = mockHotels;
+
+    // Search by name or location
+    if (searchTerm) {
+      filtered = filtered.filter(hotel => 
+        hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hotel.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hotel.city.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by price range
+    filtered = filtered.filter(hotel => 
+      hotel.price >= priceRange[0] && hotel.price <= priceRange[1]
+    );
+
+    // Filter by room types
+    if (selectedRoomTypes.length > 0) {
+      filtered = filtered.filter(hotel => 
+        hotel.roomTypes.some(type => selectedRoomTypes.includes(type))
+      );
+    }
+
+    // Filter by amenities
+    if (selectedAmenities.length > 0) {
+      filtered = filtered.filter(hotel => 
+        selectedAmenities.every(amenity => hotel.amenities.includes(amenity))
+      );
+    }
+
+    // Sort hotels
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'rating':
+          return b.rating - a.rating;
+        case 'verified':
+          return (b.verified ? 1 : 0) - (a.verified ? 1 : 0);
+        default:
+          return b.reviewCount - a.reviewCount;
+      }
+    });
+
+    setFilteredHotels(filtered);
+  }, [searchTerm, priceRange, selectedRoomTypes, selectedAmenities, sortBy]);
 
   const roomTypeFilters = [
     { id: 'economy', label: 'Economy', icon: '💰' },
@@ -105,14 +198,17 @@ const Hotels = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input 
-                placeholder="Search hotels in Kathmandu..." 
+                placeholder="Search hotels by name or location..." 
                 className="pl-10 py-3"
-                defaultValue="Kathmandu"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-4">
               <div className="text-sm text-gray-600">
-                <span className="font-medium">156 hotels found</span> • 3 guests • 2 nights
+                <span className="font-medium">{filteredHotels.length} hotels found</span> 
+                {locationParam && <span> in {locationParam}</span>}
+                {guestsParam !== '2' && <span> • {guestsParam} guests</span>}
               </div>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="w-4 h-4" />
@@ -208,93 +304,103 @@ const Hotels = () => {
 
           {/* Hotel Listings */}
           <div className="lg:col-span-3">
-            <div className="space-y-6">
-              {mockHotels.map(hotel => (
-                <div key={hotel.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                  <div className="flex flex-col lg:flex-row">
-                    {/* Hotel Image */}
-                    <div className="lg:w-80 h-48 lg:h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
-                      <div className="text-8xl opacity-80">{hotel.image}</div>
-                      {hotel.verified && (
-                        <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                          <Shield className="w-3 h-3 mr-1" />
-                          KahaTAG Verified
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Hotel Info */}
-                    <div className="flex-1 p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">{hotel.name}</h3>
-                          <div className="flex items-center text-gray-600 mb-3">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            <span className="text-sm">{hotel.location}</span>
+            {filteredHotels.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🏨</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No hotels found</h3>
+                <p className="text-gray-600">Try adjusting your search or filters</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {filteredHotels.map(hotel => (
+                  <div key={hotel.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                    <div className="flex flex-col lg:flex-row">
+                      {/* Hotel Image */}
+                      <div className="lg:w-80 h-48 lg:h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
+                        <div className="text-8xl opacity-80">{hotel.image}</div>
+                        {hotel.verified && (
+                          <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                            <Shield className="w-3 h-3 mr-1" />
+                            KahaTAG Verified
                           </div>
-                          <div className="flex items-center mb-4">
-                            <div className="flex items-center">
-                              {[...Array(5)].map((_, i) => (
-                                <Star 
-                                  key={i} 
-                                  className={`w-4 h-4 ${i < Math.floor(hotel.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
-                                />
-                              ))}
+                        )}
+                      </div>
+
+                      {/* Hotel Info */}
+                      <div className="flex-1 p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">{hotel.name}</h3>
+                            <div className="flex items-center text-gray-600 mb-3">
+                              <MapPin className="w-4 h-4 mr-1" />
+                              <span className="text-sm">{hotel.location}</span>
                             </div>
-                            <span className="text-sm text-gray-600 ml-2">
-                              {hotel.rating} ({hotel.reviewCount} reviews)
-                            </span>
+                            <div className="flex items-center mb-4">
+                              <div className="flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star 
+                                    key={i} 
+                                    className={`w-4 h-4 ${i < Math.floor(hotel.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm text-gray-600 ml-2">
+                                {hotel.rating} ({hotel.reviewCount} reviews)
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-3xl font-bold text-blue-600">₹{hotel.price.toLocaleString()}</div>
+                            <div className="text-sm text-gray-500">per night</div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-3xl font-bold text-blue-600">₹{hotel.price.toLocaleString()}</div>
-                          <div className="text-sm text-gray-500">per night</div>
+
+                        {/* Room Types */}
+                        <div className="mb-4">
+                          <span className="text-sm text-gray-600 font-medium">Available: </span>
+                          <span className="text-sm text-gray-800">
+                            {hotel.roomTypes.map(type => type.charAt(0).toUpperCase() + type.slice(1)).join(', ')}
+                          </span>
                         </div>
-                      </div>
 
-                      {/* Room Types */}
-                      <div className="mb-4">
-                        <span className="text-sm text-gray-600 font-medium">Available: </span>
-                        <span className="text-sm text-gray-800">
-                          {hotel.roomTypes.map(type => type.charAt(0).toUpperCase() + type.slice(1)).join(', ')}
-                        </span>
-                      </div>
+                        {/* Amenities */}
+                        <div className="flex items-center space-x-4 mb-6">
+                          {hotel.amenities.slice(0, 4).map(amenity => {
+                            const amenityConfig = amenityFilters.find(a => a.id === amenity);
+                            if (amenityConfig) {
+                              const Icon = amenityConfig.icon;
+                              return (
+                                <div key={amenity} className="flex items-center space-x-1 text-gray-600">
+                                  <Icon className="w-4 h-4" />
+                                  <span className="text-xs">{amenityConfig.label}</span>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
 
-                      {/* Amenities */}
-                      <div className="flex items-center space-x-4 mb-6">
-                        {hotel.amenities.map(amenity => {
-                          const amenityConfig = amenityFilters.find(a => a.id === amenity);
-                          if (amenityConfig) {
-                            const Icon = amenityConfig.icon;
-                            return (
-                              <div key={amenity} className="flex items-center space-x-1 text-gray-600">
-                                <Icon className="w-4 h-4" />
-                                <span className="text-xs">{amenityConfig.label}</span>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })}
+                        {/* Action Button */}
+                        <Link to={`/hotels/${hotel.id}`}>
+                          <Button className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 px-8">
+                            View Details & Book
+                          </Button>
+                        </Link>
                       </div>
-
-                      {/* Action Button */}
-                      <Link to={`/hotels/${hotel.id}`}>
-                        <Button className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 px-8">
-                          View Details & Book
-                        </Button>
-                      </Link>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Load More */}
-            <div className="text-center mt-12">
-              <Button variant="outline" size="lg" className="px-8">
-                Load More Hotels
-              </Button>
-            </div>
+            {filteredHotels.length > 0 && (
+              <div className="text-center mt-12">
+                <Button variant="outline" size="lg" className="px-8">
+                  Load More Hotels
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

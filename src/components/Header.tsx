@@ -1,18 +1,27 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Globe, Menu, X, MapPin, Users, Calendar } from 'lucide-react';
+import { Search, Globe, Menu, X, MapPin, Users, Calendar, LogIn, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearchDetail, setShowSearchDetail] = useState(false);
+  const [searchLocation, setSearchLocation] = useState('');
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    navigate('/hotels');
-    setShowSearchDetail(false);
+    if (searchLocation.trim()) {
+      navigate(`/hotels?location=${encodeURIComponent(searchLocation.trim())}`);
+      setShowSearchDetail(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -43,11 +52,18 @@ const Header = () => {
           <div className="hidden lg:flex items-center relative">
             <div className="relative">
               <div 
-                className="flex items-center bg-gray-50 rounded-lg px-3 py-2 cursor-pointer border border-gray-200 hover:border-blue-300 transition-colors"
+                className="flex items-center bg-gray-50 rounded-lg px-3 py-2 cursor-pointer border border-gray-200 hover:border-blue-300 transition-colors min-w-[280px]"
                 onClick={() => setShowSearchDetail(!showSearchDetail)}
               >
                 <Search className="w-4 h-4 text-gray-400 mr-2" />
-                <span className="text-gray-600 text-sm">Search location & guests</span>
+                <Input
+                  placeholder="Search hotels, locations..."
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="border-none bg-transparent p-0 text-sm focus:ring-0"
+                  onClick={(e) => e.stopPropagation()}
+                />
               </div>
               
               {showSearchDetail && (
@@ -57,7 +73,13 @@ const Header = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Location</label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input placeholder="Where are you going?" className="pl-10" />
+                        <Input 
+                          placeholder="Where are you going?" 
+                          className="pl-10" 
+                          value={searchLocation}
+                          onChange={(e) => setSearchLocation(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                        />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -98,11 +120,19 @@ const Header = () => {
               <Globe className="w-4 h-4" />
               <span className="text-sm">EN</span>
             </button>
-            <Button variant="outline" size="sm">Login</Button>
+            <Link to="/hotel-owner-login">
+              <Button variant="outline" size="sm">
+                <LogIn className="w-4 h-4 mr-2" />
+                Owner Login
+              </Button>
+            </Link>
             <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Register</Button>
-            <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-              Get KAHA Tag
-            </Button>
+            <Link to="/hotel-owner-register">
+              <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                <Building className="w-4 h-4 mr-2" />
+                List Your Hotel
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -117,15 +147,40 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 py-4">
-            <nav className="flex flex-col space-y-4">
+            {/* Mobile Search */}
+            <div className="mb-4 px-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search hotels, locations..."
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <nav className="flex flex-col space-y-4 px-4">
               <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
               <Link to="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</Link>
               <Link to="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</Link>
               <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</Link>
               <Link to="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</Link>
-              <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-                <Button variant="outline" size="sm">Login</Button>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Register</Button>
+              <div className="flex flex-col space-y-2 pt-4 border-t border-gray-100">
+                <Link to="/hotel-owner-login">
+                  <Button variant="outline" size="sm" className="w-full">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Owner Login
+                  </Button>
+                </Link>
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 w-full">Register</Button>
+                <Link to="/hotel-owner-register">
+                  <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 w-full">
+                    <Building className="w-4 h-4 mr-2" />
+                    List Your Hotel
+                  </Button>
+                </Link>
               </div>
             </nav>
           </div>
