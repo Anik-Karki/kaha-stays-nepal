@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Globe, Menu, X, MapPin, Users, Calendar, LogIn, Building } from 'lucide-react';
@@ -29,18 +28,18 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">K</span>
             </div>
-            <div>
+            <div className="hidden sm:block">
               <span className="font-bold text-xl text-gray-900">KAHA</span>
               <span className="text-sm text-blue-600 ml-1">Hotel</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-8">
             <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
             <Link to="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</Link>
             <Link to="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</Link>
@@ -48,26 +47,26 @@ const Header = () => {
             <Link to="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</Link>
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden lg:flex items-center relative">
-            <div className="relative">
+          {/* Search Bar - Hidden on mobile */}
+          <div className="hidden xl:flex items-center relative flex-1 max-w-md mx-8">
+            <div className="relative w-full">
               <div 
-                className="flex items-center bg-gray-50 rounded-lg px-3 py-2 cursor-pointer border border-gray-200 hover:border-blue-300 transition-colors min-w-[280px]"
+                className="flex items-center bg-gray-50 rounded-lg px-3 py-2 cursor-pointer border border-gray-200 hover:border-blue-300 transition-colors w-full"
                 onClick={() => setShowSearchDetail(!showSearchDetail)}
               >
-                <Search className="w-4 h-4 text-gray-400 mr-2" />
+                <Search className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                 <Input
                   placeholder="Search hotels, locations..."
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  className="border-none bg-transparent p-0 text-sm focus:ring-0"
+                  className="border-none bg-transparent p-0 text-sm focus:ring-0 w-full"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
               
               {showSearchDetail && (
-                <div className="absolute top-full mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-50">
+                <div className="absolute top-full mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-50 right-0">
                   <div className="grid grid-cols-1 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Location</label>
@@ -115,22 +114,23 @@ const Header = () => {
           </div>
 
           {/* Right Side Items */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4 flex-shrink-0">
             <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors">
               <Globe className="w-4 h-4" />
-              <span className="text-sm">EN</span>
+              <span className="text-sm hidden lg:inline">EN</span>
             </button>
             <Link to="/hotel-owner-login">
-              <Button variant="outline" size="sm">
-                <LogIn className="w-4 h-4 mr-2" />
-                Owner Login
+              <Button variant="outline" size="sm" className="text-xs lg:text-sm">
+                <LogIn className="w-4 h-4 mr-1 lg:mr-2" />
+                <span className="hidden lg:inline">Owner Login</span>
+                <span className="lg:hidden">Login</span>
               </Button>
             </Link>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Register</Button>
             <Link to="/hotel-owner-register">
-              <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                <Building className="w-4 h-4 mr-2" />
-                List Your Hotel
+              <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-xs lg:text-sm">
+                <Building className="w-4 h-4 mr-1 lg:mr-2" />
+                <span className="hidden lg:inline">List Your Hotel</span>
+                <span className="lg:hidden">List Hotel</span>
               </Button>
             </Link>
           </div>
@@ -138,7 +138,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden"
+            className="md:hidden ml-2"
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -162,20 +162,19 @@ const Header = () => {
             </div>
 
             <nav className="flex flex-col space-y-4 px-4">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
-              <Link to="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors">Hotels</Link>
-              <Link to="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">Categories</Link>
-              <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About Us</Link>
-              <Link to="/help" className="text-gray-700 hover:text-blue-600 transition-colors">Help Center</Link>
+              <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Home</Link>
+              <Link to="/hotels" className="text-gray-700 hover:text-blue-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Hotels</Link>
+              <Link to="/categories" className="text-gray-700 hover:text-blue-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Categories</Link>
+              <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors" onClick={() => setIsMenuOpen(false)}>About Us</Link>
+              <Link to="/help" className="text-gray-700 hover:text-blue-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Help Center</Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-100">
-                <Link to="/hotel-owner-login">
+                <Link to="/hotel-owner-login" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="outline" size="sm" className="w-full">
                     <LogIn className="w-4 h-4 mr-2" />
                     Owner Login
                   </Button>
                 </Link>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 w-full">Register</Button>
-                <Link to="/hotel-owner-register">
+                <Link to="/hotel-owner-register" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 w-full">
                     <Building className="w-4 h-4 mr-2" />
                     List Your Hotel

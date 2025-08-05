@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Filter, Star, MapPin, Wifi, Car, Coffee, Utensils, Shield } from 'lucide-react';
@@ -33,7 +32,7 @@ const Hotels = () => {
       rating: 4.8,
       reviewCount: 234,
       price: 2500,
-      image: '🏛️',
+      image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=300&fit=crop',
       verified: true,
       roomTypes: ['economy', 'standarddelux', 'suite'],
       amenities: ['wifi', 'parking', 'restaurant', 'breakfast'],
@@ -46,7 +45,7 @@ const Hotels = () => {
       rating: 4.6,
       reviewCount: 189,
       price: 3200,
-      image: '🏔️',
+      image: 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=400&h=300&fit=crop',
       verified: true,
       roomTypes: ['standarddelux', 'suite', 'family'],
       amenities: ['wifi', 'restaurant', 'breakfast', 'spa'],
@@ -59,7 +58,7 @@ const Hotels = () => {
       rating: 4.4,
       reviewCount: 156,
       price: 1800,
-      image: '⛰️',
+      image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop',
       verified: false,
       roomTypes: ['economy', 'standarddelux'],
       amenities: ['wifi', 'parking', 'breakfast'],
@@ -72,7 +71,7 @@ const Hotels = () => {
       rating: 4.9,
       reviewCount: 312,
       price: 4500,
-      image: '🏰',
+      image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop',
       verified: true,
       roomTypes: ['suite', 'family'],
       amenities: ['wifi', 'parking', 'restaurant', 'breakfast', 'spa'],
@@ -85,7 +84,7 @@ const Hotels = () => {
       rating: 4.5,
       reviewCount: 178,
       price: 3800,
-      image: '🐘',
+      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
       verified: true,
       roomTypes: ['standarddelux', 'family'],
       amenities: ['wifi', 'restaurant', 'breakfast'],
@@ -98,7 +97,7 @@ const Hotels = () => {
       rating: 4.7,
       reviewCount: 145,
       price: 2800,
-      image: '☸️',
+      image: 'https://images.unsplash.com/photo-1544640344-2b89510b1fe8?w=400&h=300&fit=crop',
       verified: true,
       roomTypes: ['economy', 'standarddelux', 'suite'],
       amenities: ['wifi', 'parking', 'restaurant', 'breakfast'],
@@ -194,7 +193,7 @@ const Hotels = () => {
       {/* Search Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row gap-4 items-center">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input 
@@ -204,13 +203,13 @@ const Hotels = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
               <div className="text-sm text-gray-600">
                 <span className="font-medium">{filteredHotels.length} hotels found</span> 
                 {locationParam && <span> in {locationParam}</span>}
                 {guestsParam !== '2' && <span> • {guestsParam} guests</span>}
               </div>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
                 <Filter className="w-4 h-4" />
                 Modify Search
               </Button>
@@ -316,8 +315,12 @@ const Hotels = () => {
                   <div key={hotel.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                     <div className="flex flex-col lg:flex-row">
                       {/* Hotel Image */}
-                      <div className="lg:w-80 h-48 lg:h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
-                        <div className="text-8xl opacity-80">{hotel.image}</div>
+                      <div className="lg:w-80 h-48 lg:h-64 relative overflow-hidden">
+                        <img 
+                          src={hotel.image} 
+                          alt={hotel.name}
+                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                        />
                         {hotel.verified && (
                           <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
                             <Shield className="w-3 h-3 mr-1" />
@@ -328,8 +331,8 @@ const Hotels = () => {
 
                       {/* Hotel Info */}
                       <div className="flex-1 p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
+                        <div className="flex flex-col lg:flex-row justify-between items-start mb-4">
+                          <div className="flex-1">
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{hotel.name}</h3>
                             <div className="flex items-center text-gray-600 mb-3">
                               <MapPin className="w-4 h-4 mr-1" />
@@ -349,8 +352,8 @@ const Hotels = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-3xl font-bold text-blue-600">₹{hotel.price.toLocaleString()}</div>
+                          <div className="text-right mt-4 lg:mt-0">
+                            <div className="text-2xl lg:text-3xl font-bold text-blue-600">₹{hotel.price.toLocaleString()}</div>
                             <div className="text-sm text-gray-500">per night</div>
                           </div>
                         </div>
@@ -364,7 +367,7 @@ const Hotels = () => {
                         </div>
 
                         {/* Amenities */}
-                        <div className="flex items-center space-x-4 mb-6">
+                        <div className="flex flex-wrap items-center gap-4 mb-6">
                           {hotel.amenities.slice(0, 4).map(amenity => {
                             const amenityConfig = amenityFilters.find(a => a.id === amenity);
                             if (amenityConfig) {
