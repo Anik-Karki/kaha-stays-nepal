@@ -20,7 +20,14 @@ import NotFound from "./pages/NotFound";
 import RoomManagement from "./pages/RoomManagement";
 import BookingManagement from "./pages/BookingManagement";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
