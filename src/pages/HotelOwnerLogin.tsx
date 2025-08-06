@@ -1,36 +1,57 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { LogIn, Eye, EyeOff, Building, Shield } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { LogIn, Eye, EyeOff, Building, Shield, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuthStore } from '@/stores/authStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const HotelOwnerLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuthStore();
+  
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: 'admin@hotel.com',
+    password: 'demo123'
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const from = location.state?.from?.pathname || '/admin/dashboard';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
-    // Simulate login process
-    setTimeout(() => {
+    try {
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        navigate(from, { replace: true });
+      } else {
+        setError('Invalid email or password. Use demo credentials.');
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      // For demo purposes, redirect to admin dashboard
-      navigate('/hotel-admin');
-    }, 1500);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError('');
   };
+
+  const demoCredentials = [
+    { email: 'admin@hotel.com', password: 'demo123', role: 'Full Admin' },
+    { email: 'owner@hotel.com', password: 'demo123', role: 'Hotel Owner' },
+    { email: 'staff@hotel.com', password: 'demo123', role: 'Staff Member' }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,9 +65,17 @@ const HotelOwnerLogin = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Building className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Hotel Owner Login</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Hotel Admin Login</h1>
               <p className="text-gray-600">Access your hotel management dashboard</p>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+                <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0" />
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-6">
@@ -116,7 +145,7 @@ const HotelOwnerLogin = () => {
               </Button>
             </form>
 
-            {/* Links */}
+            {/* Register Link */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
               <p className="text-gray-600 mb-4">Don't have an account?</p>
               <Link to="/hotel-owner-register">
@@ -127,11 +156,30 @@ const HotelOwnerLogin = () => {
               </Link>
             </div>
 
-            {/* Demo Notice */}
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-center">
-              <p className="text-sm text-blue-700">
-                <strong>Demo Mode:</strong> Use any email/password to login
-              </p>
+            {/* Demo Credentials */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-3">Demo Credentials:</h4>
+              <div className="space-y-2">
+                {demoCredentials.map((cred, index) => (
+                  <div key={index} className="text-sm">
+                    <div className="flex justify-between items-center p-2 bg-white rounded border">
+                      <div>
+                        <span className="font-medium text-blue-700">{cred.role}:</span>
+                        <span className="ml-2 text-gray-600">{cred.email}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setFormData({ email: cred.email, password: cred.password })}
+                        className="text-xs"
+                      >
+                        Use
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

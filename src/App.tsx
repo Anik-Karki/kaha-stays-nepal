@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
+import AdminLayout from "./components/AdminLayout";
 import Index from "./pages/Index";
 import Hotels from "./pages/Hotels";
 import HotelDetail from "./pages/HotelDetail";
@@ -12,7 +14,7 @@ import About from "./pages/About";
 import Help from "./pages/Help";
 import HotelOwnerLogin from "./pages/HotelOwnerLogin";
 import HotelOwnerRegister from "./pages/HotelOwnerRegister";
-import HotelAdmin from "./pages/HotelAdmin";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,8 +34,35 @@ const App = () => (
           <Route path="/help" element={<Help />} />
           <Route path="/hotel-owner-login" element={<HotelOwnerLogin />} />
           <Route path="/hotel-owner-register" element={<HotelOwnerRegister />} />
-          <Route path="/hotel-admin" element={<HotelAdmin />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={
+            <PrivateRoute>
+              <AdminLayout />
+            </PrivateRoute>
+          }>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="bookings" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Bookings Management</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
+            <Route path="rooms" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Room Management</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
+            <Route path="guests" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Guest Database</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
+            <Route path="analytics" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Analytics & Reports</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
+            <Route path="settings" element={
+              <PrivateRoute requiredRoles={['admin']}>
+                <div className="p-8 text-center"><h2 className="text-2xl font-bold">Hotel Settings</h2><p className="text-gray-600 mt-2">Admin only - Coming soon...</p></div>
+              </PrivateRoute>
+            } />
+          </Route>
+
+          {/* Legacy route for backward compatibility */}
+          <Route path="/hotel-admin" element={
+            <PrivateRoute>
+              <AdminLayout />
+            </PrivateRoute>
+          }>
+            <Route index element={<AdminDashboard />} />
+          </Route>
+
+          {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
