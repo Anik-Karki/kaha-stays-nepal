@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,8 @@ import HotelOwnerLogin from "./pages/HotelOwnerLogin";
 import HotelOwnerRegister from "./pages/HotelOwnerRegister";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import RoomManagement from "./pages/RoomManagement";
+import BookingManagement from "./pages/BookingManagement";
 
 const queryClient = new QueryClient();
 
@@ -42,8 +43,8 @@ const App = () => (
             </PrivateRoute>
           }>
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="bookings" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Bookings Management</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
-            <Route path="rooms" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Room Management</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
+            <Route path="rooms" element={<RoomManagement />} />
+            <Route path="bookings" element={<BookingManagement />} />
             <Route path="guests" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Guest Database</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
             <Route path="analytics" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Analytics & Reports</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
             <Route path="settings" element={
