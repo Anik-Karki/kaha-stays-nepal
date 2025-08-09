@@ -20,7 +20,7 @@ const JoinAsPartner = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <svg width="100%" height="100%" viewBox="0 0 60 60">
@@ -35,20 +35,20 @@ const JoinAsPartner = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div>
-            <div className="inline-flex items-center bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Building className="w-4 h-4 mr-2" />
-              Partner with KAHA Hotel
+              Partner with Kaha Stays Nepal
             </div>
 
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
               Join Nepal's Leading
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
-                Hotel Platform
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
+                Tourism Platform
               </span>
             </h2>
             
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Grow your hotel business with KAHA's trusted platform. Reach more guests, increase bookings, and build your digital presence with our comprehensive hotel management solution.
+              Grow your hospitality business with Nepal's most trusted platform. Connect with travelers seeking authentic experiences and showcase the beauty of Nepal through your accommodation.
             </p>
 
             {/* Benefits Grid */}
@@ -62,11 +62,11 @@ const JoinAsPartner = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 px-8 py-4 text-lg">
-                List My Hotel
+              <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-8 py-4 text-lg">
+                List My Property
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-2 hover:bg-orange-50">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-2 hover:bg-emerald-50">
                 Learn More
               </Button>
             </div>
@@ -81,7 +81,7 @@ const JoinAsPartner = () => {
                   const Icon = stat.icon;
                   return (
                     <div key={index} className="text-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
@@ -92,18 +92,18 @@ const JoinAsPartner = () => {
               </div>
 
               {/* Partner Success Story */}
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6">
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex-shrink-0"></div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex-shrink-0"></div>
                   <div>
                     <h4 className="font-bold text-gray-900 mb-2">Hotel Success Story</h4>
                     <p className="text-sm text-gray-600 mb-3">
-                      "Since joining KAHA Hotel, our bookings increased by 150% and we gained access to travelers we never reached before."
+                      "Since joining Kaha Stays Nepal, our bookings increased by 150% and we connected with travelers seeking authentic Nepal experiences."
                     </p>
                     <div className="flex items-center text-sm">
-                      <div className="font-medium text-orange-600">Raj Kumar</div>
+                      <div className="font-medium text-emerald-600">Raj Kumar</div>
                       <div className="text-gray-500 mx-2">•</div>
-                      <div className="text-gray-600">Hotel Mountain View, Pokhara</div>
+                      <div className="text-gray-600">Mountain View Lodge, Pokhara</div>
                     </div>
                   </div>
                 </div>
@@ -111,27 +111,27 @@ const JoinAsPartner = () => {
 
               {/* Partnership Benefits */}
               <div className="mt-6">
-                <h4 className="font-bold text-gray-900 mb-4">Why Hotels Choose KAHA:</h4>
+                <h4 className="font-bold text-gray-900 mb-4">Why Properties Choose Kaha:</h4>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3 text-sm">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                    <span className="text-gray-700">Verified guest reviews increase trust</span>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <span className="text-gray-700">Authentic guest reviews build trust</span>
                   </div>
                   <div className="flex items-center space-x-3 text-sm">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
                     <span className="text-gray-700">Real-time booking management</span>
                   </div>
                   <div className="flex items-center space-x-3 text-sm">
-                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-                    <span className="text-gray-700">Marketing support & promotion</span>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-700">Nepal tourism promotion support</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-full opacity-20 animate-pulse"></div>
-            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-teal-400 to-green-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
           </div>
         </div>
       </div>

@@ -10,14 +10,14 @@ const SearchDestinations = () => {
       image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop',
       description: 'Cultural Heritage & Temples',
       hotels: '180+ hotels',
-      gradient: 'from-orange-400 to-red-500'
+      gradient: 'from-emerald-400 to-green-500'
     },
     {
       name: 'Pokhara',
       image: 'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=400&h=300&fit=crop',
       description: 'Lakes & Mountain Views',
       hotels: '120+ hotels',
-      gradient: 'from-blue-400 to-indigo-500'
+      gradient: 'from-teal-400 to-emerald-500'
     },
     {
       name: 'Chitwan',
@@ -31,23 +31,23 @@ const SearchDestinations = () => {
       image: 'https://images.unsplash.com/photo-1544640344-2b89510b1fe8?w=400&h=300&fit=crop',
       description: 'Buddha\'s Birthplace',
       hotels: '30+ hotels',
-      gradient: 'from-purple-400 to-pink-500'
+      gradient: 'from-emerald-400 to-teal-500'
     },
     {
       name: 'Everest Base Camp',
       image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop',
       description: 'Himalayan Adventure',
       hotels: '25+ lodges',
-      gradient: 'from-gray-400 to-slate-600'
+      gradient: 'from-green-400 to-emerald-600'
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <section className="py-20 bg-gradient-to-br from-emerald-50 to-teal-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Search Hotels by <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Destination</span>
+            Explore Nepal by <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Destination</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Explore Nepal's most beautiful destinations and find the perfect place to stay
@@ -72,17 +72,17 @@ const SearchDestinations = () => {
               </div>
               
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
                   {destination.name}
                 </h3>
                 <p className="text-sm text-gray-600 mb-2">
                   {destination.description}
                 </p>
-                <p className="text-sm font-medium text-blue-600">
+                <p className="text-sm font-medium text-emerald-600">
                   {destination.hotels}
                 </p>
                 
-                <div className="mt-4 flex items-center text-blue-600 group-hover:translate-x-2 transition-transform duration-300">
+                <div className="mt-4 flex items-center text-emerald-600 group-hover:translate-x-2 transition-transform duration-300">
                   <span className="text-sm font-medium">Explore</span>
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </div>
@@ -115,7 +115,7 @@ const SearchDestinations = () => {
                   <p className="text-sm text-gray-600 mb-2">
                     {destination.description}
                   </p>
-                  <p className="text-sm font-medium text-blue-600">
+                  <p className="text-sm font-medium text-emerald-600">
                     {destination.hotels}
                   </p>
                 </div>
@@ -127,7 +127,7 @@ const SearchDestinations = () => {
         {/* CTA */}
         <div className="text-center mt-12">
           <Link to="/hotels">
-            <button className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold transition-colors duration-300 transform hover:scale-105">
+            <button className="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-full font-semibold transition-colors duration-300 transform hover:scale-105">
               <MapPin className="w-5 h-5 mr-2" />
               View All Destinations
             </button>

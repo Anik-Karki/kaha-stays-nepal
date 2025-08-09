@@ -4,7 +4,7 @@ import { Smartphone, Download, Star } from 'lucide-react';
 
 const DownloadApp = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden relative">
+    <section className="py-20 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-700 text-white overflow-hidden relative">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <svg width="100%" height="100%" viewBox="0 0 100 100">
@@ -25,14 +25,14 @@ const DownloadApp = () => {
             </div>
 
             <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-              Take KAHA Hotel 
+              Explore Nepal 
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
-                Anywhere You Go
+                On The Go
               </span>
             </h2>
             
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-              Download our mobile app for seamless hotel booking, real-time updates, and exclusive mobile-only deals across Nepal.
+            <p className="text-xl text-emerald-100 mb-8 leading-relaxed">
+              Download our mobile app for seamless booking, real-time updates, and discover authentic Nepal experiences wherever you are.
             </p>
 
             {/* App Features */}
@@ -94,28 +94,28 @@ const DownloadApp = () => {
               <div className="w-80 h-[640px] bg-gray-900 rounded-[3rem] p-4 shadow-2xl">
                 <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative">
                   {/* Status Bar */}
-                  <div className="bg-blue-600 h-12 flex items-center justify-between px-6 text-white text-sm">
+                  <div className="bg-emerald-600 h-12 flex items-center justify-between px-6 text-white text-sm">
                     <span>9:41</span>
-                    <span>KAHA Hotel</span>
+                    <span>Kaha Stays Nepal</span>
                     <span>100%</span>
                   </div>
                   
                   {/* App Content */}
                   <div className="p-4 space-y-4">
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
-                      <h3 className="font-bold text-gray-900 mb-2">Find Hotels Nearby</h3>
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4">
+                      <h3 className="font-bold text-gray-900 mb-2">Discover Nepal Stays</h3>
                       <div className="flex items-center text-sm text-gray-600">
                         <Smartphone className="w-4 h-4 mr-2" />
-                        <span>12 hotels found in 2km radius</span>
+                        <span>12 authentic stays found nearby</span>
                       </div>
                     </div>
                     
                     <div className="space-y-3">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="flex items-center space-x-3 bg-gray-50 rounded-lg p-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg"></div>
+                          <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg"></div>
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900">Hotel Name {i}</div>
+                            <div className="font-medium text-gray-900">Nepal Stay {i}</div>
                             <div className="text-sm text-gray-600">⭐ 4.{i + 5} • ₹{2000 + i * 500}/night</div>
                           </div>
                         </div>
@@ -126,8 +126,8 @@ const DownloadApp = () => {
               </div>
 
               {/* Floating Elements */}
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-400 rounded-full opacity-80 animate-bounce"></div>
-              <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-pink-400 rounded-full opacity-60 animate-pulse"></div>
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-emerald-400 rounded-full opacity-80 animate-bounce"></div>
+              <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-teal-400 rounded-full opacity-60 animate-pulse"></div>
               <div className="absolute top-1/3 -left-8 w-6 h-6 bg-green-400 rounded-full opacity-70 animate-ping"></div>
             </div>
           </div>

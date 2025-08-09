@@ -187,18 +187,18 @@ const Hotels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 to-teal-50/30">
       <Header />
       
       {/* Search Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-6">
+      <div className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100/50">
+        <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-500 w-5 h-5" />
               <Input 
                 placeholder="Search hotels by name or location..." 
-                className="pl-10 py-3"
+                className="pl-12 py-4 text-base border-2 border-gray-200 focus:border-emerald-500 rounded-xl shadow-sm bg-white/80 backdrop-blur-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -209,7 +209,7 @@ const Hotels = () => {
                 {locationParam && <span> in {locationParam}</span>}
                 {guestsParam !== '2' && <span> • {guestsParam} guests</span>}
               </div>
-              <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
+              <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-300">
                 <Filter className="w-4 h-4" />
                 Modify Search
               </Button>
@@ -222,8 +222,8 @@ const Hotels = () => {
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-              <h3 className="font-bold text-lg mb-6">Filters</h3>
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-8 sticky top-24 border border-white/20">
+              <h3 className="font-bold text-xl mb-8 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Filters</h3>
               
               {/* Price Range */}
               <div className="mb-8">
@@ -252,7 +252,7 @@ const Hotels = () => {
                         type="checkbox"
                         checked={selectedRoomTypes.includes(filter.id)}
                         onChange={() => toggleFilter(filter.id, 'roomType')}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-lg">{filter.icon}</span>
                       <span className="text-sm">{filter.label}</span>
@@ -273,7 +273,7 @@ const Hotels = () => {
                           type="checkbox"
                           checked={selectedAmenities.includes(filter.id)}
                           onChange={() => toggleFilter(filter.id, 'amenity')}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         />
                         <Icon className="w-4 h-4 text-gray-600" />
                         <span className="text-sm">{filter.label}</span>
@@ -289,13 +289,13 @@ const Hotels = () => {
                 <select 
                   value={sortBy} 
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/80 backdrop-blur-sm"
                 >
                   <option value="popularity">Most Popular</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
                   <option value="rating">Highest Rated</option>
-                  <option value="verified">KahaTAG Verified</option>
+                  <option value="verified">Verified Hotels</option>
                 </select>
               </div>
             </div>
@@ -304,57 +304,58 @@ const Hotels = () => {
           {/* Hotel Listings */}
           <div className="lg:col-span-3">
             {filteredHotels.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">🏨</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No hotels found</h3>
-                <p className="text-gray-600">Try adjusting your search or filters</p>
+              <div className="text-center py-16 bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20">
+                <div className="text-8xl mb-6">🏨</div>
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">No hotels found</h3>
+                <p className="text-gray-600 text-lg">Try adjusting your search criteria or explore different locations</p>
               </div>
             ) : (
               <div className="space-y-6">
                 {filteredHotels.map(hotel => (
-                  <div key={hotel.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                  <div key={hotel.id} className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden border border-white/20 transform hover:-translate-y-2">
                     <div className="flex flex-col lg:flex-row">
                       {/* Hotel Image */}
                       <div className="lg:w-80 h-48 lg:h-64 relative overflow-hidden">
                         <img 
                           src={hotel.image} 
                           alt={hotel.name}
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
                         {hotel.verified && (
-                          <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                          <div className="absolute top-4 left-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-full text-xs font-semibold flex items-center shadow-lg">
                             <Shield className="w-3 h-3 mr-1" />
-                            KahaTAG Verified
+                            Verified
                           </div>
                         )}
                       </div>
 
                       {/* Hotel Info */}
-                      <div className="flex-1 p-6">
-                        <div className="flex flex-col lg:flex-row justify-between items-start mb-4">
+                      <div className="flex-1 p-8">
+                        <div className="flex flex-col lg:flex-row justify-between items-start mb-6">
                           <div className="flex-1">
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{hotel.name}</h3>
-                            <div className="flex items-center text-gray-600 mb-3">
-                              <MapPin className="w-4 h-4 mr-1" />
-                              <span className="text-sm">{hotel.location}</span>
+                            <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">{hotel.name}</h3>
+                            <div className="flex items-center text-gray-600 mb-4">
+                              <MapPin className="w-5 h-5 mr-2 text-emerald-500" />
+                              <span className="text-base font-medium">{hotel.location}</span>
                             </div>
-                            <div className="flex items-center mb-4">
-                              <div className="flex items-center">
+                            <div className="flex items-center mb-6">
+                              <div className="flex items-center bg-gradient-to-r from-yellow-50 to-orange-50 px-3 py-1 rounded-full">
                                 {[...Array(5)].map((_, i) => (
                                   <Star 
                                     key={i} 
-                                    className={`w-4 h-4 ${i < Math.floor(hotel.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                                    className={`w-5 h-5 ${i < Math.floor(hotel.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
                                   />
                                 ))}
                               </div>
-                              <span className="text-sm text-gray-600 ml-2">
+                              <span className="text-base text-gray-700 ml-3 font-medium">
                                 {hotel.rating} ({hotel.reviewCount} reviews)
                               </span>
                             </div>
                           </div>
-                          <div className="text-right mt-4 lg:mt-0">
-                            <div className="text-2xl lg:text-3xl font-bold text-blue-600">₹{hotel.price.toLocaleString()}</div>
-                            <div className="text-sm text-gray-500">per night</div>
+                          <div className="text-right mt-4 lg:mt-0 bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-xl border border-emerald-100">
+                            <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">₹{hotel.price.toLocaleString()}</div>
+                            <div className="text-sm text-gray-600 font-medium">per night</div>
                           </div>
                         </div>
 
@@ -385,7 +386,7 @@ const Hotels = () => {
 
                         {/* Action Button */}
                         <Link to={`/hotels/${hotel.id}`}>
-                          <Button className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 px-8">
+                          <Button className="w-full lg:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-10 py-3 text-base font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 rounded-xl">
                             View Details & Book
                           </Button>
                         </Link>
@@ -398,8 +399,8 @@ const Hotels = () => {
 
             {/* Load More */}
             {filteredHotels.length > 0 && (
-              <div className="text-center mt-12">
-                <Button variant="outline" size="lg" className="px-8">
+              <div className="text-center mt-16">
+                <Button variant="outline" size="lg" className="px-12 py-4 text-base border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-300 rounded-xl shadow-lg">
                   Load More Hotels
                 </Button>
               </div>

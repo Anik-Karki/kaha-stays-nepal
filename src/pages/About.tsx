@@ -21,62 +21,92 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 to-teal-50/30">
       <Header />
       
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">About Kaha Hotel</h1>
-            <p className="text-xl mb-8">
-              Nepal's most trusted hotel booking platform, powered by verified location technology
+      {/* Premium Hero Section */}
+      <div className="bg-gradient-to-br from-emerald-600 via-teal-600 to-green-700 text-white py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg width="100%" height="100%" viewBox="0 0 60 60">
+            <pattern id="about-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+              <circle cx="30" cy="30" r="2" fill="currentColor" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#about-pattern)" />
+          </svg>
+        </div>
+        
+        <div className="container mx-auto px-4 relative">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg">
+              <Shield className="w-4 h-4 mr-2" />
+              Trusted by 50,000+ travelers since 2020
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">KAHA Hotel</span>
+            </h1>
+            <p className="text-xl mb-12 leading-relaxed text-emerald-100 max-w-4xl mx-auto">
+              Nepal's most trusted hotel booking platform, powered by verified location technology and 
+              dedicated to connecting travelers with authentic Nepalese hospitality experiences.
             </p>
+            
+            {/* Floating Elements */}
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-emerald-400 via-teal-500 to-green-500 rounded-full opacity-20 animate-pulse blur-xl"></div>
+            <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-gradient-to-br from-teal-400 via-emerald-500 to-green-500 rounded-full opacity-20 animate-pulse delay-1000 blur-xl"></div>
           </div>
         </div>
       </div>
 
-      {/* Mission Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              At Kaha Hotel, we believe that every traveler deserves a trustworthy and seamless booking experience. 
+      {/* Premium Mission Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg">
+              <Award className="w-4 h-4 mr-2" />
+              Our Mission & Vision
+            </div>
+            
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-8">
+              Revolutionizing Travel in Nepal
+            </h2>
+            <p className="text-xl text-gray-600 leading-relaxed max-w-4xl mx-auto">
+              At KAHA Hotel, we believe that every traveler deserves a trustworthy and seamless booking experience. 
               We leverage cutting-edge location verification technology through our KahaTAG system to ensure that 
-              every hotel listing is authentic, accurate, and reliable.
+              every hotel listing is authentic, accurate, and reliable. Our mission is to connect the world with 
+              Nepal's incredible hospitality while supporting local communities.
             </p>
           </div>
 
-          {/* Key Features */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-blue-600" />
+          {/* Premium Key Features */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                <Shield className="w-10 h-10 text-white" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Verified Hotels</h3>
-              <p className="text-sm text-gray-600">Every hotel is verified through our KahaTAG system</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-lg">KahaTAG Verified</h3>
+              <p className="text-gray-600 leading-relaxed">Every hotel is verified through our proprietary KahaTAG location system for authenticity</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-green-600" />
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                <MapPin className="w-10 h-10 text-white" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Accurate Locations</h3>
-              <p className="text-sm text-gray-600">Precise location data with in-app navigation</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-lg">Precise Locations</h3>
+              <p className="text-gray-600 leading-relaxed">GPS-accurate location data with turn-by-turn navigation to your destination</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-purple-600" />
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-10 h-10 text-white" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Local Expertise</h3>
-              <p className="text-sm text-gray-600">Built by locals for travelers to Nepal</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-lg">Local Expertise</h3>
+              <p className="text-gray-600 leading-relaxed">Built by Nepalese locals who understand the culture and hospitality landscape</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-orange-600" />
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                <Award className="w-10 h-10 text-white" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Quality Assured</h3>
-              <p className="text-sm text-gray-600">Rigorous quality checks for all listings</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-lg">Quality Assured</h3>
+              <p className="text-gray-600 leading-relaxed">Rigorous quality checks and continuous monitoring of all hotel listings</p>
             </div>
           </div>
         </div>

@@ -79,26 +79,61 @@ const Help = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 to-teal-50/30">
       <Header />
       
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Help Center</h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Find answers to your questions or get in touch with our support team
+      {/* Premium Hero Section */}
+      <div className="bg-gradient-to-br from-emerald-600 via-teal-600 to-green-700 text-white py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg width="100%" height="100%" viewBox="0 0 60 60">
+            <pattern id="help-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+              <circle cx="30" cy="30" r="2" fill="currentColor" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#help-pattern)" />
+          </svg>
+        </div>
+        
+        <div className="container mx-auto px-4 text-center relative">
+          <div className="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg">
+            <MessageCircle className="w-4 h-4 mr-2" />
+            24/7 Premium Support Available
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+            Help <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">Center</span>
+          </h1>
+          <p className="text-xl mb-12 max-w-3xl mx-auto leading-relaxed text-emerald-100">
+            Find answers to your questions or get in touch with our expert support team. 
+            We're here to make your Nepal travel experience seamless and memorable.
           </p>
           
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              placeholder="Search for help articles..."
-              className="pl-12 py-4 text-lg bg-white text-gray-900"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          {/* Premium Search Bar */}
+          <div className="max-w-3xl mx-auto relative">
+            <div className="relative">
+              <div className="absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Search className="w-5 h-5 text-white" />
+              </div>
+              <Input
+                placeholder="Search for help articles, booking issues, or travel tips..."
+                className="pl-20 pr-6 py-6 text-lg bg-white/95 backdrop-blur-xl text-gray-900 border-2 border-white/50 rounded-2xl shadow-2xl focus:border-emerald-300 focus:ring-4 focus:ring-emerald-200/50"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            {/* Quick Search Suggestions */}
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              {['Booking Issues', 'Payment Problems', 'Hotel Verification', 'Cancellation Policy'].map((suggestion, index) => (
+                <button 
+                  key={index}
+                  onClick={() => setSearchQuery(suggestion.toLowerCase())}
+                  className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/30 transition-all duration-300 shadow-lg"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
