@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-=======
-
 import React from "react";
->>>>>>> 2ace7be5d283e3fc07a0668a7700c5f5a3f0241a
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,16 +12,12 @@ import HotelDetail from "./pages/HotelDetail";
 import Categories from "./pages/Categories";
 import About from "./pages/About";
 import Help from "./pages/Help";
-<<<<<<< HEAD
 import OwnerLogin from "./pages/OwnerLogin";
 import OwnerDashboard from "./pages/OwnerDashboard";
-
 import TestPage from "./pages/TestPage";
-=======
 import HotelOwnerLogin from "./pages/HotelOwnerLogin";
 import HotelOwnerRegister from "./pages/HotelOwnerRegister";
 import AdminDashboard from "./pages/AdminDashboard";
->>>>>>> 2ace7be5d283e3fc07a0668a7700c5f5a3f0241a
 import NotFound from "./pages/NotFound";
 import RoomManagement from "./pages/RoomManagement";
 import BookingManagement from "./pages/BookingManagement";
@@ -53,16 +45,13 @@ const App = () => (
           <Route path="/categories" element={<Categories />} />
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Help />} />
-<<<<<<< HEAD
           
-          {/* New Simple Owner Login & Dashboard */}
+          {/* Owner Login & Dashboard Routes */}
           <Route path="/owner-login" element={<OwnerLogin />} />
           <Route path="/owner-dashboard" element={<OwnerDashboard />} />
           <Route path="/test" element={<TestPage />} />
           
-          {/* Legacy routes for backward compatibility */}
-          <Route path="/hotel-owner-login" element={<OwnerLogin />} />
-=======
+          {/* Hotel Owner Routes */}
           <Route path="/hotel-owner-login" element={<HotelOwnerLogin />} />
           <Route path="/hotel-owner-register" element={<HotelOwnerRegister />} />
           
@@ -92,7 +81,6 @@ const App = () => (
           }>
             <Route index element={<AdminDashboard />} />
           </Route>
->>>>>>> 2ace7be5d283e3fc07a0668a7700c5f5a3f0241a
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
