@@ -7,6 +7,7 @@ export interface Room {
   name: string;
   type: 'economy' | 'standard' | 'deluxe' | 'suite' | 'family';
   capacity: number;
+  quantity: number; // How many rooms of this type
   price: number;
   status: 'available' | 'occupied' | 'maintenance' | 'unavailable';
   amenities: string[];
@@ -152,10 +153,14 @@ const MOCK_ROOMS: Room[] = [
     name: 'Annapurna Suite',
     type: 'suite',
     capacity: 4,
+    quantity: 2,
     price: 8500,
     status: 'available',
-    amenities: ['WiFi', 'AC', 'Balcony', 'Mountain View', 'Mini Bar'],
-    images: ['🏔️', '🛏️', '🛁'],
+    amenities: ['wifi', 'ac', 'balcony', 'room_service'],
+    images: [
+      'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=300&fit=crop',
+      'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=400&h=300&fit=crop'
+    ],
     bookings: 15,
     description: 'Luxury suite with stunning Annapurna mountain views',
     published: true,
@@ -166,10 +171,13 @@ const MOCK_ROOMS: Room[] = [
     name: 'Everest Deluxe',
     type: 'deluxe',
     capacity: 2,
+    quantity: 5,
     price: 6500,
     status: 'occupied',
-    amenities: ['WiFi', 'AC', 'Mountain View', 'Room Service'],
-    images: ['🏔️', '🛏️'],
+    amenities: ['wifi', 'ac', 'tv', 'room_service'],
+    images: [
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop'
+    ],
     bookings: 22,
     description: 'Premium room with Everest views',
     published: true,
@@ -180,10 +188,13 @@ const MOCK_ROOMS: Room[] = [
     name: 'Kathmandu Classic',
     type: 'standard',
     capacity: 2,
+    quantity: 8,
     price: 3500,
     status: 'available',
-    amenities: ['WiFi', 'Fan', 'City View'],
-    images: ['🏙️', '🛏️'],
+    amenities: ['wifi', 'tv'],
+    images: [
+      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop'
+    ],
     bookings: 18,
     description: 'Comfortable double room with city views',
     published: true,

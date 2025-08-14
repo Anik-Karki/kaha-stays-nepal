@@ -1,3 +1,6 @@
+/* Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -122,4 +125,36 @@ All colors MUST be HSL.
                 linear-gradient(45deg, #10b981, #14b8a6) border-box;
     border: 2px solid transparent;
   }
+}
+
+/* Leaflet Map Customizations */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-control-zoom a {
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #374151;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #f9fafb;
+  border-color: #10b981;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  font-size: 10px;
 }

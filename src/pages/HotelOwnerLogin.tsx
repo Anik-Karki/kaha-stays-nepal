@@ -1,110 +1,186 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, Eye, EyeOff, Building, Shield, AlertCircle } from 'lucide-react';
+import { Building, Phone, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuthStore } from '@/stores/authStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import OTPVerification from '../components/OTPVerification';
+import { useAuthStore } from '@/stores/authStore';
 
 const HotelOwnerLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuthStore();
-  
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: 'admin@hotel.com',
-    password: 'demo123'
-  });
+  const [loginStep, setLoginStep] = useState<'phone' | 'otp'>('phone');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginData, setLoginData] = useState({
+    contactNumber: '',
+    password: '',
+    rememberMe: false
+  });
 
-  const from = location.state?.from?.pathname || '/admin/dashboard';
+  // Get the intended destination from location state
+  const from = location.state?.from?.pathname || '/owner-dashboard';
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePhoneLogin = async () => {
+    if (!loginData.contactNumber || loginData.contactNumber.length < 10) {
+      alert('Please enter a valid contact number');
+      return;
+    }
+
     setIsLoading(true);
-    setError('');
-    
     try {
-      const success = await login(formData.email, formData.password);
+      // Try login with auth store (for demo, use owner@hotel.com)
+      const success = await login('owner@hotel.com', loginData.password || 'demo123');
+
       if (success) {
+        // Also set legacy auth for OwnerDashboard compatibility
+        localStorage.setItem("hotelOwnerAuth", JSON.stringify({
+          user: {
+            name: 'Hotel Owner',
+            email: 'owner@hotel.com',
+            phone: loginData.contactNumber
+          }
+        }));
+
+        alert('Login successful!');
         navigate(from, { replace: true });
       } else {
-        setError('Invalid email or password. Use demo credentials.');
+        alert('Invalid credentials. Try password: demo123');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (error) setError('');
+  const handleOTPLogin = () => {
+    setContactNumber(loginData.contactNumber);
+    setLoginStep('otp');
   };
 
-  const demoCredentials = [
-    { email: 'admin@hotel.com', password: 'demo123', role: 'Full Admin' },
-    { email: 'owner@hotel.com', password: 'demo123', role: 'Hotel Owner' },
-    { email: 'staff@hotel.com', password: 'demo123', role: 'Staff Member' }
-  ];
+  const handleOTPVerificationComplete = async (data: { otp: string; fullName?: string; contactNumber: string; requiresName: boolean }) => {
+    try {
+      // For demo, login with owner credentials after OTP verification
+      const success = await login('owner@hotel.com', 'demo123');
+
+      if (success) {
+        // Also set legacy auth for OwnerDashboard compatibility
+        localStorage.setItem("hotelOwnerAuth", JSON.stringify({
+          user: {
+            name: 'Hotel Owner',
+            email: 'owner@hotel.com',
+            phone: data.contactNumber
+          }
+        }));
+
+        alert('Login successful!');
+        navigate(from, { replace: true });
+      } else {
+        alert('Login failed after OTP verification');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
+    }
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setLoginData(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (loginStep === 'otp') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Building className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Hotel Owner Login</h1>
+                <p className="text-gray-600">Verify your phone number to continue</p>
+              </div>
+
+              <OTPVerification
+                contactNumber={contactNumber}
+                onContactNumberChange={setContactNumber}
+                onVerificationComplete={handleOTPVerificationComplete}
+              />
+
+              <div className="mt-6 text-center">
+                <button
+                  type="button"
+                  onClick={() => setLoginStep('phone')}
+                  className="text-sm text-gray-600 hover:text-gray-700"
+                >
+                  ← Back to login options
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-lg p-8">
-            {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Building className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Hotel Admin Login</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Hotel Owner Login</h1>
               <p className="text-gray-600">Access your hotel management dashboard</p>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
-                <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0" />
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
-
-            {/* Login Form */}
-            <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                  Contact Number *
                 </label>
-                <Input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  className="w-full"
-                />
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="tel"
+                    value={loginData.contactNumber}
+                    onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+                    placeholder="98XXXXXXXX"
+                    className="pl-10"
+                    maxLength={10}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter your registered 10-digit mobile number
+                </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
+                  Password (Optional)
                 </label>
                 <div className="relative">
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
+                    value={loginData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     placeholder="Enter your password"
-                    required
-                    className="w-full pr-10"
+                    className="pr-10"
                   />
                   <button
                     type="button"
@@ -114,71 +190,80 @@ const HotelOwnerLogin = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Leave blank to login with OTP verification
+                </p>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center">
-                  <input type="checkbox" className="rounded border-gray-300 text-blue-600 mr-2" />
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  type="checkbox"
+                  checked={loginData.rememberMe}
+                  onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Remember me
                 </label>
-                <Link to="/forgot-password" className="text-blue-600 hover:text-blue-700">
-                  Forgot password?
-                </Link>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 py-3"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Logging in...
-                  </div>
+              <div className="space-y-3">
+                {loginData.password ? (
+                  <Button
+                    onClick={handlePhoneLogin}
+                    disabled={isLoading || !loginData.contactNumber}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center">
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Logging in...
+                      </div>
+                    ) : (
+                      'Login with Password'
+                    )}
+                  </Button>
                 ) : (
-                  <>
-                    <LogIn className="w-4 h-4 mr-2" />
-                    Login to Dashboard
-                  </>
+                  <Button
+                    onClick={handleOTPLogin}
+                    disabled={!loginData.contactNumber}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    Login with OTP
+                  </Button>
                 )}
-              </Button>
-            </form>
+              </div>
 
-            {/* Register Link */}
-            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-              <p className="text-gray-600 mb-4">Don't have an account?</p>
-              <Link to="/hotel-owner-register">
-                <Button variant="outline" className="w-full">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Register Your Hotel
-                </Button>
-              </Link>
+              <div className="text-center">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-3">Demo Credentials:</h4>
-              <div className="space-y-2">
-                {demoCredentials.map((cred, index) => (
-                  <div key={index} className="text-sm">
-                    <div className="flex justify-between items-center p-2 bg-white rounded border">
-                      <div>
-                        <span className="font-medium text-blue-700">{cred.role}:</span>
-                        <span className="ml-2 text-gray-600">{cred.email}</span>
-                      </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setFormData({ email: cred.email, password: cred.password })}
-                        className="text-xs"
-                      >
-                        Use
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">
+                  Don't have an account?
+                </p>
+                <Link to="/hotel-owner-register">
+                  <Button variant="outline" className="w-full">
+                    Register Your Hotel
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">Demo Login</h4>
+                <p className="text-sm text-blue-700">
+                  For testing purposes, enter any 10-digit number to login
+                </p>
               </div>
             </div>
           </div>

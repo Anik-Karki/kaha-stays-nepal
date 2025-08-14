@@ -17,7 +17,7 @@ import OwnerDashboard from "./pages/OwnerDashboard";
 import TestPage from "./pages/TestPage";
 import HotelOwnerLogin from "./pages/HotelOwnerLogin";
 import HotelOwnerRegister from "./pages/HotelOwnerRegister";
-import AdminDashboard from "./pages/AdminDashboard";
+
 import NotFound from "./pages/NotFound";
 import RoomManagement from "./pages/RoomManagement";
 import BookingManagement from "./pages/BookingManagement";
@@ -46,14 +46,14 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Help />} />
           
-          {/* Owner Login & Dashboard Routes */}
-          <Route path="/owner-login" element={<OwnerLogin />} />
-          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-          <Route path="/test" element={<TestPage />} />
-          
           {/* Hotel Owner Routes */}
           <Route path="/hotel-owner-login" element={<HotelOwnerLogin />} />
           <Route path="/hotel-owner-register" element={<HotelOwnerRegister />} />
+          
+          {/* Legacy redirects for backward compatibility */}
+          <Route path="/owner-login" element={<HotelOwnerLogin />} />
+          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+          <Route path="/test" element={<TestPage />} />
           
           {/* Protected Admin Routes */}
           <Route path="/admin" element={
@@ -61,7 +61,7 @@ const App = () => (
               <AdminLayout />
             </PrivateRoute>
           }>
-            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="dashboard" element={<OwnerDashboard />} />
             <Route path="rooms" element={<RoomManagement />} />
             <Route path="bookings" element={<BookingManagement />} />
             <Route path="guests" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold">Guest Database</h2><p className="text-gray-600 mt-2">Coming soon...</p></div>} />
@@ -79,7 +79,7 @@ const App = () => (
               <AdminLayout />
             </PrivateRoute>
           }>
-            <Route index element={<AdminDashboard />} />
+            <Route index element={<OwnerDashboard />} />
           </Route>
 
           {/* Catch-all route */}

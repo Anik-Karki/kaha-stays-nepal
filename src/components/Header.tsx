@@ -407,7 +407,7 @@ const Header = () => {
               <Globe className="w-4 h-4" />
               <span className="text-sm hidden lg:inline">EN</span>
             </button>
-            <Link to="/owner-login">
+            <Link to="/hotel-owner-login">
               <Button
                 variant="outline"
                 size="sm"
@@ -581,7 +581,7 @@ const Header = () => {
               </Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-100">
                 <Link
-                  to="/owner-login"
+                  to="/hotel-owner-login"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Button variant="outline" size="sm" className="w-full">

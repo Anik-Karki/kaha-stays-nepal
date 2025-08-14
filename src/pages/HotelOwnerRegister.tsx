@@ -1,59 +1,86 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building, MapPin, Phone, Mail, Upload, CheckCircle } from 'lucide-react';
+import { Building, MapPin, Phone, Mail, Upload, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import OTPVerification from '../components/OTPVerification';
+import MapLocationPicker from '../components/MapLocationPicker';
+import TagAvailabilityChecker from '../components/TagAvailabilityChecker';
+import ImageUpload from '../components/ImageUpload';
+import { apiService, helpers } from '../services/api';
 
 const HotelOwnerRegister = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    // Hotel Information
-    hotelName: '',
-    hotelType: '',
-    address: '',
-    city: '',
-    district: '',
+    // Basic Information
+    name: '',
+    suggestedTag: '',
+    isTagAvailable: false,
+    contactNumber: '',
+    email: '',
     description: '',
     
-    // Owner Information
-    ownerName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    // Location Information
+    coordinates: { lat: 27.7172, lon: 85.3240 }, // Default Kathmandu
+    addressInfo: null as any,
+    wardNo: '',
+    municipality: '',
+    additionalInfo: '',
     
-    // Business Details
-    license: '',
-    taxNumber: '',
-    bankAccount: '',
+    // Images
+    avatarUrl: '',
+    coverImageUrl: '',
     
-    // Hotel Features
-    totalRooms: '',
-    roomTypes: [],
-    amenities: [],
-    images: []
+    // OTP Verification
+    otp: '',
+    fullName: '',
+    requiresName: false,
+    isVerified: false,
+    
+    // Additional fields
+    tagLine: '',
+    website: '',
+    buildingInformation: '',
+    floorNo: ''
   });
 
-  const hotelTypes = [
-    'Budget Hotel', 'Business Hotel', 'Boutique Hotel', 
-    'Resort', 'Lodge', 'Guest House', 'Hostel'
-  ];
-
-  const amenitiesList = [
-    'Free WiFi', 'Parking', 'Restaurant', 'Breakfast', 'Airport Shuttle',
-    'Spa', 'Gym', 'Pool', 'Conference Room', 'Room Service', '24/7 Reception'
-  ];
-
-  const roomTypesList = [
-    'Economy', 'Standard Deluxe', 'Suite', 'Family Room', 'Presidential Suite'
+  const steps = [
+    { id: 1, title: 'Basic Info', description: 'Hotel name and tag' },
+    { id: 2, title: 'Location', description: 'Map and address' },
+    { id: 3, title: 'Images', description: 'Avatar and cover' },
+    { id: 4, title: 'Verification', description: 'Phone and submit' }
   ];
 
   const handleNext = () => {
+    // Validation for each step
+    if (currentStep === 1) {
+      if (!formData.name.trim()) {
+        alert('Please enter hotel name');
+        return;
+      }
+      if (!formData.suggestedTag || !formData.isTagAvailable) {
+        alert('Please choose an available Kaha tag');
+        return;
+      }
+      if (!formData.description.trim()) {
+        alert('Please enter hotel description');
+        return;
+      }
+    }
+    
+    if (currentStep === 2) {
+      if (!formData.wardNo.trim() || !formData.municipality.trim()) {
+        alert('Please enter ward number and municipality');
+        return;
+      }
+    }
+    
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
@@ -66,26 +93,70 @@ const HotelOwnerRegister = () => {
   };
 
   const handleSubmit = async () => {
+    if (!formData.isVerified) {
+      alert('Please complete phone verification first');
+      return;
+    }
+
     setIsLoading(true);
     
-    // Simulate registration process
-    setTimeout(() => {
-      setIsLoading(false);
-      alert('Registration submitted successfully! We will review your application within 24-48 hours.');
+    try {
+      // Compose the registration data
+      const registrationData = helpers.composeDummyProfileFromFormData(
+        formData,
+        formData.coordinates,
+        formData.addressInfo
+      );
+
+      // Submit the registration
+      const result = await apiService.registerBusiness(registrationData as any);
+      
+      alert('Registration submitted successfully! We will review your application within 24-48 hours. You can now login with your verified phone number.');
       navigate('/hotel-owner-login');
-    }, 2000);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      alert('Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleArrayToggle = (field: string, value: string) => {
+  const handleLocationSelect = (coordinates: { lat: number; lon: number }, addressInfo: any) => {
     setFormData(prev => ({
       ...prev,
-      [field]: prev[field].includes(value)
-        ? prev[field].filter(item => item !== value)
-        : [...prev[field], value]
+      coordinates,
+      addressInfo
+    }));
+  };
+
+  const handleTagChange = (tag: string, isAvailable: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      suggestedTag: tag,
+      isTagAvailable: isAvailable
+    }));
+  };
+
+  const handleImageUpload = (imageUrl: string, type: 'avatar' | 'cover') => {
+    if (type === 'avatar') {
+      setFormData(prev => ({ ...prev, avatarUrl: imageUrl }));
+    } else {
+      setFormData(prev => ({ ...prev, coverImageUrl: imageUrl }));
+    }
+  };
+
+  const handleVerificationComplete = (data: { otp: string; fullName?: string; contactNumber: string; requiresName: boolean }) => {
+    setFormData(prev => ({
+      ...prev,
+      otp: data.otp,
+      fullName: data.fullName || '',
+      contactNumber: data.contactNumber,
+      requiresName: data.requiresName,
+      isVerified: true
     }));
   };
 
@@ -94,75 +165,62 @@ const HotelOwnerRegister = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Hotel Information</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Basic Information</h3>
             
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Name *</label>
-                <Input
-                  value={formData.hotelName}
-                  onChange={(e) => handleInputChange('hotelName', e.target.value)}
-                  placeholder="Enter hotel name"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Type *</label>
-                <select
-                  value={formData.hotelType}
-                  onChange={(e) => handleInputChange('hotelType', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Select hotel type</option>
-                  {hotelTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Name *</label>
+              <Input
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Enter your hotel name"
+                required
+              />
             </div>
 
+            <TagAvailabilityChecker
+              businessName={formData.name}
+              onTagChange={handleTagChange}
+              initialTag={formData.suggestedTag}
+            />
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
-              <Input
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                placeholder="Street address"
-                required
+              <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Description *</label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Describe your hotel, amenities, and what makes it special..."
+                rows={4}
+                className="resize-none"
               />
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email (Optional)</label>
                 <Input
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
-                  placeholder="City"
-                  required
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="hotel@example.com"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">District *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website (Optional)</label>
                 <Input
-                  value={formData.district}
-                  onChange={(e) => handleInputChange('district', e.target.value)}
-                  placeholder="District"
-                  required
+                  value={formData.website}
+                  onChange={(e) => handleInputChange('website', e.target.value)}
+                  placeholder="https://yourhotel.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Description</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                placeholder="Describe your hotel..."
-                rows={4}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tag Line (Optional)</label>
+              <Input
+                value={formData.tagLine}
+                onChange={(e) => handleInputChange('tagLine', e.target.value)}
+                placeholder="A short catchy phrase about your hotel"
               />
             </div>
           </div>
@@ -171,71 +229,64 @@ const HotelOwnerRegister = () => {
       case 2:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Owner Information</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Location Information</h3>
             
+            <MapLocationPicker
+              onLocationSelect={handleLocationSelect}
+              initialCoordinates={formData.coordinates}
+            />
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ward Number *</label>
+                <Input
+                  value={formData.wardNo}
+                  onChange={(e) => handleInputChange('wardNo', e.target.value)}
+                  placeholder="Enter ward number"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Municipality *</label>
+                <Input
+                  value={formData.municipality}
+                  onChange={(e) => handleInputChange('municipality', e.target.value)}
+                  placeholder="Enter municipality"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Building Information (Optional)</label>
+                <Input
+                  value={formData.buildingInformation}
+                  onChange={(e) => handleInputChange('buildingInformation', e.target.value)}
+                  placeholder="Building name or complex"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Floor Number (Optional)</label>
+                <Input
+                  value={formData.floorNo}
+                  onChange={(e) => handleInputChange('floorNo', e.target.value)}
+                  placeholder="Floor number"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-              <Input
-                value={formData.ownerName}
-                onChange={(e) => handleInputChange('ownerName', e.target.value)}
-                placeholder="Enter your full name"
-                required
+              <label className="block text-sm font-medium text-gray-700 mb-2">Additional Information (Optional)</label>
+              <Textarea
+                value={formData.additionalInfo}
+                onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
+                placeholder="Any additional location details..."
+                rows={3}
+                className="resize-none"
               />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="your@email.com"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="+977 98XXXXXXXX"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
-                <Input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  placeholder="Create password"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
-                <Input
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  placeholder="Confirm password"
-                  required
-                />
-              </div>
             </div>
           </div>
         );
@@ -243,70 +294,35 @@ const HotelOwnerRegister = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Business Details</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Hotel Images</h3>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Business License Number</label>
-              <Input
-                value={formData.license}
-                onChange={(e) => handleInputChange('license', e.target.value)}
-                placeholder="Enter license number"
+            <div className="grid md:grid-cols-2 gap-6">
+              <ImageUpload
+                type="avatar"
+                label="Hotel Avatar"
+                description="Square image that represents your hotel (recommended: 400x400px)"
+                onImageUpload={handleImageUpload}
+                currentImageUrl={formData.avatarUrl}
+              />
+              
+              <ImageUpload
+                type="cover"
+                label="Cover Image"
+                description="Wide image showcasing your hotel (recommended: 1200x600px)"
+                onImageUpload={handleImageUpload}
+                currentImageUrl={formData.coverImageUrl}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tax Registration Number</label>
-              <Input
-                value={formData.taxNumber}
-                onChange={(e) => handleInputChange('taxNumber', e.target.value)}
-                placeholder="Enter tax number"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Total Number of Rooms *</label>
-              <Input
-                type="number"
-                value={formData.totalRooms}
-                onChange={(e) => handleInputChange('totalRooms', e.target.value)}
-                placeholder="Total rooms"
-                min="1"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Types Available</label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {roomTypesList.map(type => (
-                  <label key={type} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.roomTypes.includes(type)}
-                      onChange={() => handleArrayToggle('roomTypes', type)}
-                      className="rounded border-gray-300 text-blue-600"
-                    />
-                    <span className="text-sm">{type}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Amenities</label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {amenitiesList.map(amenity => (
-                  <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.amenities.includes(amenity)}
-                      onChange={() => handleArrayToggle('amenities', amenity)}
-                      className="rounded border-gray-300 text-blue-600"
-                    />
-                    <span className="text-sm">{amenity}</span>
-                  </label>
-                ))}
-              </div>
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 mb-2">Image Guidelines</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Use high-quality images that showcase your hotel's best features</li>
+                <li>• Avatar image will be used as your hotel's profile picture</li>
+                <li>• Cover image will be displayed prominently on your hotel page</li>
+                <li>• Supported formats: JPG, PNG (max 10MB each)</li>
+                <li>• Images can be updated later from your dashboard</li>
+              </ul>
             </div>
           </div>
         );
@@ -314,35 +330,62 @@ const HotelOwnerRegister = () => {
       case 4:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Upload Documents & Images</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Phone Verification & Submit</h3>
             
-            <div className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">Upload Hotel Images</p>
-                <p className="text-sm text-gray-500">JPG, PNG up to 10MB each (Maximum 10 images)</p>
-                <Button variant="outline" className="mt-4">
-                  Choose Images
-                </Button>
-              </div>
+            {!formData.isVerified ? (
+              <OTPVerification
+                contactNumber={formData.contactNumber}
+                onContactNumberChange={(number) => handleInputChange('contactNumber', number)}
+                onVerificationComplete={handleVerificationComplete}
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <div className="flex items-center">
+                    <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                    <span className="text-green-800 font-medium">Phone number verified successfully!</span>
+                  </div>
+                  <p className="text-green-700 text-sm mt-1">
+                    Contact: {formData.contactNumber}
+                    {formData.fullName && ` | Name: ${formData.fullName}`}
+                  </p>
+                </div>
 
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                <p className="text-gray-600 mb-2">Upload Business License</p>
-                <Button variant="outline" size="sm">
-                  Choose File
-                </Button>
-              </div>
-            </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-3">Registration Summary</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Hotel Name:</span>
+                      <span className="font-medium">{formData.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Kaha Tag:</span>
+                      <span className="font-medium">{formData.suggestedTag}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Location:</span>
+                      <span className="font-medium">
+                        {formData.municipality}, Ward {formData.wardNo}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Contact:</span>
+                      <span className="font-medium">{formData.contactNumber}</span>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• We'll review your application within 24-48 hours</li>
-                <li>• Our team may contact you for additional information</li>
-                <li>• Once approved, you'll receive login credentials</li>
-                <li>• You can then start managing your hotel listings</li>
-              </ul>
-            </div>
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• We'll review your application within 24-48 hours</li>
+                    <li>• Our team may contact you for additional information</li>
+                    <li>• Once approved, you'll receive login credentials</li>
+                    <li>• You can then start managing your hotel listings</li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -360,28 +403,30 @@ const HotelOwnerRegister = () => {
           {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
-              {[1, 2, 3, 4].map((step) => (
-                <div key={step} className="flex items-center">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${
-                    step <= currentStep 
+                    step.id <= currentStep 
                       ? 'bg-blue-600 text-white' 
                       : 'bg-gray-200 text-gray-600'
                   }`}>
-                    {step < currentStep ? <CheckCircle className="w-5 h-5" /> : step}
+                    {step.id < currentStep ? <CheckCircle className="w-5 h-5" /> : step.id}
                   </div>
-                  {step < 4 && (
+                  {index < steps.length - 1 && (
                     <div className={`flex-1 h-1 mx-4 ${
-                      step < currentStep ? 'bg-blue-600' : 'bg-gray-200'
+                      step.id < currentStep ? 'bg-blue-600' : 'bg-gray-200'
                     }`} />
                   )}
                 </div>
               ))}
             </div>
             <div className="flex justify-between mt-2 text-sm text-gray-600">
-              <span>Hotel Info</span>
-              <span>Owner Info</span>
-              <span>Business</span>
-              <span>Documents</span>
+              {steps.map(step => (
+                <div key={step.id} className="text-center">
+                  <div className="font-medium">{step.title}</div>
+                  <div className="text-xs text-gray-500">{step.description}</div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -414,12 +459,12 @@ const HotelOwnerRegister = () => {
               ) : (
                 <Button
                   onClick={handleSubmit}
-                  disabled={isLoading}
-                  className="bg-green-600 hover:bg-green-700"
+                  disabled={isLoading || !formData.isVerified}
+                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                 >
                   {isLoading ? (
                     <div className="flex items-center">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
                       Submitting...
                     </div>
                   ) : (
