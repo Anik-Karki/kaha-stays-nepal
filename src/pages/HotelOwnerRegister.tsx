@@ -42,6 +42,7 @@ const HotelOwnerRegister = () => {
     fullName: '',
     requiresName: false,
     isVerified: false,
+    currentSubStep: 'phone-input' as 'phone-input' | 'name-input' | 'otp-verification' | 'success',
     
     // Additional fields
     tagLine: '',
@@ -146,6 +147,102 @@ const HotelOwnerRegister = () => {
       setFormData(prev => ({ ...prev, avatarUrl: imageUrl }));
     } else {
       setFormData(prev => ({ ...prev, coverImageUrl: imageUrl }));
+    }
+  };
+
+  const handleSubmitPhoneNumber = async () => {
+    if (!formData.contactNumber || formData.contactNumber.length < 10) {
+      alert('Please enter a valid contact number');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Check if the number is registered with KAHA
+      const response = await apiService.triggerOTP(formData.contactNumber);
+      
+      if (response.requiresName) {
+        // Number is not registered, ask for name
+        setFormData(prev => ({
+          ...prev,
+          currentSubStep: 'name-input',
+          requiresName: true
+        }));
+      } else {
+        // Number is registered, go directly to OTP
+        setFormData(prev => ({
+          ...prev,
+          currentSubStep: 'otp-verification',
+          requiresName: false
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to check number:', error);
+      alert('Failed to process request. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRequestOTPWithName = async () => {
+    if (!formData.fullName.trim()) {
+      alert('Please enter your full name');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await apiService.triggerOTP(formData.contactNumber);
+      setFormData(prev => ({
+        ...prev,
+        currentSubStep: 'otp-verification'
+      }));
+    } catch (error) {
+      console.error('Failed to send OTP:', error);
+      alert('Failed to send OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!formData.otp || formData.otp.length !== 6) {
+      alert('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await apiService.verifyOTP(formData.contactNumber, formData.otp);
+      
+      setFormData(prev => ({
+        ...prev,
+        isVerified: true,
+        currentSubStep: 'success'
+      }));
+      
+      // Show success message for a moment, then allow final submission
+      setTimeout(() => {
+        alert('Phone verification successful! You can now submit your hotel registration.');
+      }, 1000);
+    } catch (error) {
+      console.error('OTP verification failed:', error);
+      alert('Invalid OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setIsLoading(true);
+    try {
+      await apiService.triggerOTP(formData.contactNumber);
+      alert('OTP resent successfully');
+    } catch (error) {
+      console.error('Failed to resend OTP:', error);
+      alert('Failed to resend OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -332,56 +429,199 @@ const HotelOwnerRegister = () => {
           <div className="space-y-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Phone Verification & Submit</h3>
             
-            {!formData.isVerified ? (
-              <OTPVerification
-                contactNumber={formData.contactNumber}
-                onContactNumberChange={(number) => handleInputChange('contactNumber', number)}
-                onVerificationComplete={handleVerificationComplete}
-              />
-            ) : (
+            {formData.currentSubStep === 'phone-input' && (
               <div className="space-y-6">
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                    <span className="text-green-800 font-medium">Phone number verified successfully!</span>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Phone className="w-8 h-8 text-emerald-600" />
                   </div>
-                  <p className="text-green-700 text-sm mt-1">
-                    Contact: {formData.contactNumber}
-                    {formData.fullName && ` | Name: ${formData.fullName}`}
-                  </p>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Verify Your Phone Number</h4>
+                  <p className="text-gray-600">We'll check if you're already a KAHA user</p>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-3">Registration Summary</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Contact Number *</label>
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                      +977
+                    </span>
+                    <Input
+                      type="tel"
+                      value={formData.contactNumber}
+                      onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+                      placeholder="98XXXXXXXX"
+                      className="rounded-l-none"
+                      required
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Enter your 10-digit mobile number</p>
+                </div>
+
+                <Button
+                  onClick={handleSubmitPhoneNumber}
+                  disabled={isLoading || !formData.contactNumber}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Checking...
+                    </div>
+                  ) : (
+                    'Submit'
+                  )}
+                </Button>
+
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-2">What happens when you submit?</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• We'll check if your number is already registered with KAHA</li>
+                    <li>• If registered: Direct OTP verification</li>
+                    <li>• If new: We'll ask for your name, then send OTP</li>
+                    <li>• After verification, your hotel registration will be complete</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {formData.currentSubStep === 'name-input' && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Building className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Welcome to KAHA!</h4>
+                  <p className="text-gray-600">Your number isn't registered yet. Let's get you set up.</p>
+                </div>
+
+                <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                  <div className="flex items-center">
+                    <Phone className="w-5 h-5 text-yellow-600 mr-2" />
+                    <span className="text-yellow-800 font-medium">Phone Number: {formData.contactNumber}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Your Full Name *</label>
+                  <Input
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                    placeholder="Enter your full name"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">This will be used for your KAHA account</p>
+                </div>
+
+                <Button
+                  onClick={handleRequestOTPWithName}
+                  disabled={isLoading || !formData.fullName.trim()}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Sending OTP...
+                    </div>
+                  ) : (
+                    'Request OTP'
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {formData.currentSubStep === 'otp-verification' && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Enter Verification Code</h4>
+                  <p className="text-gray-600">We've sent a 6-digit code to {formData.contactNumber}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Enter OTP *</label>
+                  <Input
+                    type="text"
+                    value={formData.otp}
+                    onChange={(e) => handleInputChange('otp', e.target.value)}
+                    placeholder="Enter 6-digit code"
+                    maxLength={6}
+                    className="text-center text-lg tracking-widest"
+                    required
+                  />
+                </div>
+
+                <Button
+                  onClick={handleVerifyOTP}
+                  disabled={isLoading || !formData.otp || formData.otp.length !== 6}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    'Verify OTP'
+                  )}
+                </Button>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Didn't receive the code?</span>
+                  <button 
+                    type="button"
+                    className="text-emerald-600 hover:text-emerald-700 font-medium"
+                    onClick={handleResendOTP}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Resending...' : 'Resend OTP'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {formData.currentSubStep === 'success' && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-12 h-12 text-green-600" />
+                  </div>
+                  <h4 className="text-2xl font-bold text-green-900 mb-2">Registration Successful! 🎉</h4>
+                  <p className="text-gray-600 text-lg">Welcome to KAHA, {formData.fullName || 'Hotel Owner'}!</p>
+                </div>
+
+                <div className="bg-green-50 rounded-lg p-6 border border-green-200">
+                  <h4 className="font-semibold text-green-900 mb-3">Your Registration Details</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Hotel Name:</span>
-                      <span className="font-medium">{formData.name}</span>
+                      <span className="text-green-700">Hotel Name:</span>
+                      <span className="font-medium text-green-900">{formData.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Kaha Tag:</span>
-                      <span className="font-medium">{formData.suggestedTag}</span>
+                      <span className="text-green-700">KAHA Tag:</span>
+                      <span className="font-medium text-green-900">@{formData.suggestedTag}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Location:</span>
-                      <span className="font-medium">
-                        {formData.municipality}, Ward {formData.wardNo}
-                      </span>
+                      <span className="text-green-700">Contact:</span>
+                      <span className="font-medium text-green-900">{formData.contactNumber}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Contact:</span>
-                      <span className="font-medium">{formData.contactNumber}</span>
-                    </div>
+                    {formData.fullName && (
+                      <div className="flex justify-between">
+                        <span className="text-green-700">Owner Name:</span>
+                        <span className="font-medium text-green-900">{formData.fullName}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">What's Next?</h4>
                   <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• We'll review your application within 24-48 hours</li>
-                    <li>• Our team may contact you for additional information</li>
-                    <li>• Once approved, you'll receive login credentials</li>
-                    <li>• You can then start managing your hotel listings</li>
+                    <li>• Your application is under review (24-48 hours)</li>
+                    <li>• You can now login with your verified phone number</li>
+                    <li>• Check your email for further instructions</li>
+                    <li>• Start preparing your hotel photos and room details</li>
                   </ul>
                 </div>
               </div>
@@ -456,11 +696,11 @@ const HotelOwnerRegister = () => {
                 <Button onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">
                   Next Step
                 </Button>
-              ) : (
+              ) : formData.currentSubStep === 'success' ? (
                 <Button
                   onClick={handleSubmit}
-                  disabled={isLoading || !formData.isVerified}
-                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                  disabled={isLoading}
+                  className="bg-green-600 hover:bg-green-700"
                 >
                   {isLoading ? (
                     <div className="flex items-center">
@@ -468,9 +708,13 @@ const HotelOwnerRegister = () => {
                       Submitting...
                     </div>
                   ) : (
-                    'Submit Application'
+                    'Complete Registration'
                   )}
                 </Button>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Complete phone verification to continue
+                </div>
               )}
             </div>
 

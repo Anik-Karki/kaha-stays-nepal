@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Star, MapPin, Phone, MessageCircle, Wifi, Car, Coffee, 
-  Utensils, Users, ArrowLeft, Calendar, CreditCard, CheckCircle, Hotel
+  Utensils, Users, ArrowLeft, Calendar, CreditCard, CheckCircle, Hotel,
+  Loader2, Shield, Lock
 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -18,6 +19,20 @@ const HotelDetail = () => {
   const [roomCount, setRoomCount] = useState(1);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedRoomMatch, setSelectedRoomMatch] = useState<any>(null);
+  
+  // Booking flow states
+  const [currentStep, setCurrentStep] = useState<'booking-form' | 'otp-verification' | 'success'>('booking-form');
+  const [bookingData, setBookingData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    specialRequests: '',
+    agreeToTerms: false,
+    otp: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [bookingId, setBookingId] = useState('');
 
   // Auto-calculate optimal rooms when guests change
   const handleGuestChange = (newGuestCount: number) => {
@@ -142,8 +157,108 @@ const HotelDetail = () => {
   const roomMatches = findBestRoomMatch(guestCount, hotel.roomTypes, roomCount);
 
   const handleBookRoom = (match: any) => {
+    console.log('Selected room match:', match); // Debug log
     setSelectedRoomMatch(match);
+    setCurrentStep('booking-form');
     setShowBookingModal(true);
+  };
+
+  // Calculate pricing based on selected room
+  const calculatePricing = () => {
+    if (!selectedRoomMatch) {
+      return { subtotal: 0, taxes: 0, total: 0 };
+    }
+    
+    const subtotal = selectedRoomMatch.totalPrice || 0;
+    const taxes = Math.round(subtotal * 0.12); // 12% taxes & service fees
+    const total = subtotal + taxes;
+    
+    return { subtotal, taxes, total };
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setBookingData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const validateBookingForm = () => {
+    if (!bookingData.firstName.trim()) {
+      alert('Please enter your first name');
+      return false;
+    }
+    if (!bookingData.lastName.trim()) {
+      alert('Please enter your last name');
+      return false;
+    }
+    if (!bookingData.email.trim() || !bookingData.email.includes('@')) {
+      alert('Please enter a valid email address');
+      return false;
+    }
+    if (!bookingData.phone.trim() || bookingData.phone.length < 10) {
+      alert('Please enter a valid phone number');
+      return false;
+    }
+    if (!bookingData.agreeToTerms) {
+      alert('Please agree to the Terms & Conditions and Privacy Policy');
+      return false;
+    }
+    return true;
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!validateBookingForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Simulate sending OTP
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setCurrentStep('otp-verification');
+      alert('OTP sent to your phone number: +977 ' + bookingData.phone + '\nFor testing, use OTP: 1111');
+    } catch (error) {
+      console.error('Failed to send OTP:', error);
+      alert('Failed to send OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!bookingData.otp || bookingData.otp.length !== 4) {
+      alert('Please enter a valid 4-digit OTP');
+      return;
+    }
+
+    if (bookingData.otp !== '1111') {
+      alert('Invalid OTP. Please use 1111 for testing.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Simulate booking submission
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setBookingId('BK' + Date.now());
+      setCurrentStep('success');
+    } catch (error) {
+      console.error('Booking submission failed:', error);
+      alert('Booking submission failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      alert('OTP resent successfully to +977 ' + bookingData.phone + '\nFor testing, use OTP: 1111');
+    } catch (error) {
+      console.error('Failed to resend OTP:', error);
+      alert('Failed to resend OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderEnhancedRoomMatches = () => {
@@ -693,190 +808,357 @@ const HotelDetail = () => {
             </DialogTitle>
           </DialogHeader>
           
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Booking Summary */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center">
-                  <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                  Booking Summary
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=80&h=60&fit=crop"
-                      alt={hotel.name}
-                      className="w-16 h-12 rounded-lg object-cover shadow-sm"
-                    />
-                    <div>
-                      <h4 className="font-semibold text-gray-900">{hotel.name}</h4>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {hotel.location}
+          {currentStep === 'booking-form' && (
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Booking Summary */}
+              <div className="space-y-6">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
+                  <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
+                    Booking Summary
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <img 
+                        src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=80&h=60&fit=crop"
+                        alt={hotel.name}
+                        className="w-16 h-12 rounded-lg object-cover shadow-sm"
+                      />
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{hotel.name}</h4>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {hotel.location}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
-                      <div className="text-gray-600">Check-in</div>
-                      <div className="font-semibold">Today</div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="bg-white rounded-lg p-3 border border-emerald-200">
+                        <div className="text-gray-600">Check-in</div>
+                        <div className="font-semibold">Today</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-emerald-200">
+                        <div className="text-gray-600">Check-out</div>
+                        <div className="font-semibold">Tomorrow</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-emerald-200">
+                        <div className="text-gray-600">Guests</div>
+                        <div className="font-semibold">{guestCount} people</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-emerald-200">
+                        <div className="text-gray-600">Rooms</div>
+                        <div className="font-semibold">{roomCount} room{roomCount > 1 ? 's' : ''}</div>
+                      </div>
                     </div>
-                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
-                      <div className="text-gray-600">Check-out</div>
-                      <div className="font-semibold">Tomorrow</div>
-                    </div>
-                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
-                      <div className="text-gray-600">Guests</div>
-                      <div className="font-semibold">{guestCount} people</div>
-                    </div>
-                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
-                      <div className="text-gray-600">Rooms</div>
-                      <div className="font-semibold">{roomCount} room{roomCount > 1 ? 's' : ''}</div>
-                    </div>
-                  </div>
 
-                  {/* Pricing Breakdown */}
-                  <div className="bg-white rounded-lg p-4 border border-emerald-200">
-                    <h5 className="font-semibold text-gray-900 mb-3">Price Breakdown</h5>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>{roomCount} room{roomCount > 1 ? 's' : ''} × 1 night</span>
-                        <span>₹{(2500 * roomCount).toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Taxes & service fees</span>
-                        <span>₹{Math.round(2500 * roomCount * 0.12).toLocaleString()}</span>
-                      </div>
-                      <div className="border-t border-gray-200 pt-2 mt-2">
-                        <div className="flex justify-between font-bold text-lg">
-                          <span>Total Amount</span>
-                          <span className="text-emerald-600">₹{Math.round(2500 * roomCount * 1.12).toLocaleString()}</span>
+                    {/* Pricing Breakdown */}
+                    <div className="bg-white rounded-lg p-4 border border-emerald-200">
+                      <h5 className="font-semibold text-gray-900 mb-3">Price Breakdown</h5>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>{roomCount} room{roomCount > 1 ? 's' : ''} × 1 night</span>
+                          <span>₹{(2500 * roomCount).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Taxes & service fees</span>
+                          <span>₹{Math.round(2500 * roomCount * 0.12).toLocaleString()}</span>
+                        </div>
+                        <div className="border-t border-gray-200 pt-2 mt-2">
+                          <div className="flex justify-between font-bold text-lg">
+                            <span>Total Amount</span>
+                            <span className="text-emerald-600">₹{Math.round(2500 * roomCount * 1.12).toLocaleString()}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Booking Form */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-                <h3 className="font-bold text-gray-900 mb-6 text-lg">Guest Information</h3>
+              {/* Booking Form */}
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+                  <h3 className="font-bold text-gray-900 mb-6 text-lg">Guest Information</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">First Name *</label>
+                        <Input 
+                          value={bookingData.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          placeholder="Enter first name" 
+                          className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">Last Name *</label>
+                        <Input 
+                          value={bookingData.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          placeholder="Enter last name" 
+                          className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Email Address *</label>
+                      <Input 
+                        type="email" 
+                        value={bookingData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="Enter your email address" 
+                        className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Phone Number *</label>
+                      <div className="flex">
+                        <span className="inline-flex items-center px-3 rounded-l-xl border-2 border-r-0 border-gray-200 bg-gray-50 text-gray-500 text-sm">
+                          +977
+                        </span>
+                        <Input 
+                          type="tel" 
+                          value={bookingData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          placeholder="98XXXXXXXX" 
+                          className="border-2 border-gray-200 focus:border-emerald-500 rounded-l-none rounded-r-xl py-3"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Special Requests</label>
+                      <textarea 
+                        value={bookingData.specialRequests}
+                        onChange={(e) => handleInputChange('specialRequests', e.target.value)}
+                        placeholder="Any special requests or preferences..."
+                        className="w-full px-4 py-3 border-2 border-gray-200 focus:border-emerald-500 rounded-xl resize-none"
+                        rows={3}
+                      />
+                    </div>
+
+                    {/* Payment Method - Pay at Property Only */}
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border-2 border-blue-200">
+                      <h5 className="font-semibold text-gray-900 mb-3">Payment Method</h5>
+                      <div className="bg-white rounded-lg p-4 border border-blue-300">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="radio" name="payment" value="pay-at-property" checked readOnly className="text-blue-600" />
+                          <CreditCard className="w-5 h-5 text-blue-600" />
+                          <div>
+                            <span className="text-sm font-medium text-blue-900">Pay at Property</span>
+                            <p className="text-xs text-blue-700">You can pay when you arrive at the hotel</p>
+                          </div>
+                        </label>
+                      </div>
+                      <div className="mt-3 flex items-center text-gray-600">
+                        <Shield className="w-4 h-4 mr-2" />
+                        <span className="text-xs">Secure booking - No payment required now</span>
+                      </div>
+                    </div>
+
+                    {/* Terms and Conditions */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <label className="flex items-start space-x-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={bookingData.agreeToTerms}
+                          onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
+                          className="mt-1 text-emerald-600" 
+                          required 
+                        />
+                        <span className="text-sm text-blue-800">
+                          I agree to the <span className="font-semibold underline">Terms & Conditions</span> and <span className="font-semibold underline">Privacy Policy</span>. 
+                          I understand the cancellation policy and booking terms.
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowBookingModal(false)}
+                    className="flex-1 py-4 text-base font-semibold border-2 border-gray-300 hover:border-gray-400 rounded-xl"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleConfirmBooking}
+                    disabled={!bookingData.agreeToTerms || isLoading}
+                    className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 rounded-xl disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center">
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        Sending OTP...
+                      </div>
+                    ) : (
+                      <>
+                        <CreditCard className="w-5 h-5 mr-2" />
+                        Confirm Booking ₹{Math.round(2500 * roomCount * 1.12).toLocaleString()}
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Security Notice */}
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 text-green-800">
+                    <Lock className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      🔒 Your booking is secured with 256-bit SSL encryption
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'otp-verification' && (
+            <div className="max-w-md mx-auto">
+              <div className="bg-white rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Phone className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Phone Number</h3>
+                <p className="text-gray-600 mb-2">We've sent a 4-digit OTP to +977 {bookingData.phone}</p>
+                <p className="text-sm text-blue-600 font-medium mb-6">For testing, use OTP: <strong>1111</strong></p>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Enter 4-digit OTP *
+                  </label>
+                  <Input
+                    type="text"
+                    value={bookingData.otp}
+                    onChange={(e) => handleInputChange('otp', e.target.value)}
+                    placeholder="1111"
+                    maxLength={4}
+                    className="text-center text-lg tracking-widest border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
+                    required
+                  />
+                </div>
+
+                <div className="flex space-x-4 mb-4">
+                  <Button
+                    onClick={() => setCurrentStep('booking-form')}
+                    variant="outline"
+                    className="flex-1 py-3"
+                  >
+                    Back to Form
+                  </Button>
+                  <Button
+                    onClick={handleVerifyOTP}
+                    disabled={isLoading || !bookingData.otp || bookingData.otp.length !== 4}
+                    className="flex-1 bg-green-600 hover:bg-green-700 py-3"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center">
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Verifying...
+                      </div>
+                    ) : (
+                      'Verify & Complete Booking'
+                    )}
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Didn't receive the code?</span>
+                  <button 
+                    type="button"
+                    className="text-green-600 hover:text-green-700 font-medium"
+                    onClick={handleResendOTP}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Resending...' : 'Resend OTP'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'success' && (
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white rounded-2xl p-8 text-center">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-12 h-12 text-green-600" />
+                </div>
                 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-800 mb-2">First Name *</label>
-                      <Input 
-                        placeholder="Enter first name" 
-                        className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
-                        required
-                      />
+                <h3 className="text-3xl font-bold text-green-900 mb-4">Booking Successful! 🎉</h3>
+                <p className="text-gray-600 text-lg mb-6">
+                  Your booking has been confirmed. You will receive a confirmation message shortly.
+                </p>
+
+                <div className="bg-green-50 rounded-lg p-6 border border-green-200 mb-6">
+                  <h4 className="font-semibold text-green-900 mb-4">Booking Details</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Booking ID:</span>
+                      <span className="font-medium text-green-900">{bookingId}</span>
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-800 mb-2">Last Name *</label>
-                      <Input 
-                        placeholder="Enter last name" 
-                        className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
-                        required
-                      />
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Guest Name:</span>
+                      <span className="font-medium text-green-900">{bookingData.firstName} {bookingData.lastName}</span>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Email Address *</label>
-                    <Input 
-                      type="email" 
-                      placeholder="Enter your email address" 
-                      className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Phone Number *</label>
-                    <Input 
-                      type="tel" 
-                      placeholder="+977 98XXXXXXXX" 
-                      className="border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-3"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Special Requests</label>
-                    <textarea 
-                      placeholder="Any special requests or preferences..."
-                      className="w-full px-4 py-3 border-2 border-gray-200 focus:border-emerald-500 rounded-xl resize-none"
-                      rows={3}
-                    />
-                  </div>
-
-                  {/* Payment Method */}
-                  <div className="bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl p-4 border border-gray-200">
-                    <h5 className="font-semibold text-gray-900 mb-3">Payment Method</h5>
-                    <div className="space-y-2">
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input type="radio" name="payment" value="card" defaultChecked className="text-emerald-600" />
-                        <span className="text-sm font-medium">Credit/Debit Card</span>
-                        <div className="flex space-x-1 ml-auto">
-                          <div className="w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">V</div>
-                          <div className="w-8 h-5 bg-red-600 rounded text-white text-xs flex items-center justify-center font-bold">M</div>
-                        </div>
-                      </label>
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input type="radio" name="payment" value="paypal" className="text-emerald-600" />
-                        <span className="text-sm font-medium">PayPal</span>
-                      </label>
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input type="radio" name="payment" value="bank" className="text-emerald-600" />
-                        <span className="text-sm font-medium">Bank Transfer</span>
-                      </label>
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Hotel:</span>
+                      <span className="font-medium text-green-900">{hotel.name}</span>
                     </div>
-                  </div>
-
-                  {/* Terms and Conditions */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <label className="flex items-start space-x-3 cursor-pointer">
-                      <input type="checkbox" className="mt-1 text-emerald-600" required />
-                      <span className="text-sm text-blue-800">
-                        I agree to the <span className="font-semibold underline">Terms & Conditions</span> and <span className="font-semibold underline">Privacy Policy</span>. 
-                        I understand the cancellation policy and booking terms.
-                      </span>
-                    </label>
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Check-in:</span>
+                      <span className="font-medium text-green-900">Today</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Check-out:</span>
+                      <span className="font-medium text-green-900">Tomorrow</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-green-700">Total Amount:</span>
+                      <span className="font-medium text-green-900">₹{Math.round(2500 * roomCount * 1.12).toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex space-x-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowBookingModal(false)}
-                  className="flex-1 py-4 text-base font-semibold border-2 border-gray-300 hover:border-gray-400 rounded-xl"
-                >
-                  Cancel
-                </Button>
-                <Button className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 rounded-xl">
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  Confirm Booking ₹{Math.round(2500 * roomCount * 1.12).toLocaleString()}
-                </Button>
-              </div>
+                <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                  <h5 className="font-medium text-blue-900 mb-2">What's Next?</h5>
+                  <ul className="text-sm text-blue-700 space-y-1 text-left">
+                    <li>• You will receive a confirmation SMS/Email</li>
+                    <li>• Please arrive at the hotel on your check-in date</li>
+                    <li>• Payment will be collected at the property</li>
+                    <li>• Contact the hotel directly for any changes</li>
+                  </ul>
+                </div>
 
-              {/* Security Notice */}
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <div className="flex items-center space-x-2 text-green-800">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">
-                    🔒 Your booking is secured with 256-bit SSL encryption
-                  </span>
+                <div className="flex space-x-4">
+                  <Button
+                    onClick={() => navigate('/hotels')}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Browse More Hotels
+                  </Button>
+                  <Button
+                    onClick={() => setShowBookingModal(false)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  >
+                    Close
+                  </Button>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
 

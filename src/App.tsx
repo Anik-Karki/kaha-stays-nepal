@@ -17,6 +17,9 @@ import OwnerDashboard from "./pages/OwnerDashboard";
 import TestPage from "./pages/TestPage";
 import HotelOwnerLogin from "./pages/HotelOwnerLogin";
 import HotelOwnerRegister from "./pages/HotelOwnerRegister";
+import BookingPage from "./pages/BookingPage";
+import HotelDetails from "./pages/HotelDetails";
+import HotelSearch from "./pages/HotelSearch";
 
 import NotFound from "./pages/NotFound";
 import RoomManagement from "./pages/RoomManagement";
@@ -42,6 +45,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/hotels" element={<Hotels />} />
           <Route path="/hotels/:id" element={<HotelDetail />} />
+          <Route path="/hotel-details/:id" element={<HotelDetails />} />
+          <Route path="/hotel-search" element={<HotelSearch />} />
+          <Route path="/booking/:hotelId" element={<BookingPage />} />
+          <Route path="/booking/:hotelId/:roomId" element={<BookingPage />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Help />} />

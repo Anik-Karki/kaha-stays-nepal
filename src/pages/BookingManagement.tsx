@@ -18,7 +18,7 @@ const BookingManagement = () => {
 
   const handleStatusUpdate = (bookingId: string, newStatus: Booking['status']) => {
     updateBookingStatus(bookingId, newStatus);
-    
+
     // Add notification
     const booking = bookings.find(b => b.id === bookingId);
     if (booking) {
@@ -35,7 +35,7 @@ const BookingManagement = () => {
   const handleCancelBooking = (bookingId: string) => {
     if (confirm('Are you sure you want to cancel this booking?')) {
       cancelBooking(bookingId);
-      
+
       const booking = bookings.find(b => b.id === bookingId);
       if (booking) {
         addNotification({
@@ -50,13 +50,13 @@ const BookingManagement = () => {
   };
 
   const filteredBookings = bookings.filter(booking => {
-    const matchesSearch = 
+    const matchesSearch =
       booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.roomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.id.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 

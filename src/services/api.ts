@@ -60,6 +60,29 @@ export interface OTPResponse {
   requiresName: boolean;
 }
 
+export interface BookingData {
+  hotelId: string;
+  guestName: string;
+  guestPhone: string;
+  guestEmail?: string;
+  checkInDate: string;
+  checkOutDate: string;
+  adults: number;
+  children: number;
+  rooms: number;
+  roomType: string;
+  roomPrice: number;
+  totalAmount: number;
+  specialRequests?: string;
+  paymentMethod: 'pay-at-property';
+}
+
+export interface BookingResponse {
+  success: boolean;
+  bookingId: string;
+  message: string;
+}
+
 export interface TagAvailabilityResponse {
   isAvailableTag: boolean;
   business?: {
@@ -111,6 +134,23 @@ export const apiService = {
     
     if (!response.ok) {
       throw new Error('Failed to trigger OTP');
+    }
+    
+    return response.json();
+  },
+
+  // Verify OTP
+  async verifyOTP(contactNumber: string, otp: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_BASE_URL}/unifiedRegistration/verify-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ contactNumber, otp }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to verify OTP');
     }
     
     return response.json();
@@ -172,6 +212,40 @@ export const apiService = {
     
     if (!response.ok) {
       throw new Error('Failed to register business');
+    }
+    
+    return response.json();
+  },
+
+  // Submit hotel booking
+  async submitBooking(bookingData: BookingData): Promise<BookingResponse> {
+    const response = await fetch(`${API_BASE_URL}/bookings`, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookingData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to submit booking');
+    }
+    
+    return response.json();
+  },
+
+  // Get hotel details
+  async getHotelDetails(hotelId: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/hotels/${hotelId}`, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get hotel details');
     }
     
     return response.json();
